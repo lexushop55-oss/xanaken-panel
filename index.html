@@ -42,9 +42,17 @@
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 20h.01M2 8.82a15 15 0 0 1 20 0M5 12.86a10 10 0 0 1 14 0M8.5 16.43a5 5 0 0 1 7 0"/></symbol>
   <symbol id="i-swap" viewBox="0 0 24 24"><path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m10 14 2-2 2 2M12 12v5"/></symbol>
+  <symbol id="i-chats" viewBox="0 0 24 24"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+  <symbol id="i-restore" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+  <symbol id="i-sim" viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="8" y="11" width="8" height="7" rx="1"/><path d="M12 11v7M8 14.5h8"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M16.75 12h3.63a1 1 0 0 1 .9 1.45l-2.04 4.07a1 1 0 0 1-1.7.13l-2.13-2.97"/><path d="M17.1 9.05a1 1 0 0 1 .45 1.34l-3.1 6.21a1 1 0 0 1-1.35.45L3.6 12.3a2.92 2.92 0 0 1-1.3-3.91L3.7 5.6a2.92 2.92 0 0 1 3.9-1.3z"/><path d="M2 19h3.76a2 2 0 0 0 1.8-1.1L9 15M2 21v-4M7 9h.01"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
 </svg>
 
-<div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="bg" aria-hidden="true"><span class="emb bg-emb"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span></div>
 <div class="wm" aria-hidden="true"></div>
 
 <div class="boot" id="boot" aria-hidden="true">
@@ -71,12 +79,14 @@
         <p class="sub">private panel</p>
       </div>
     </div>
-    <p class="status"><i aria-hidden="true"></i>online</p>
+    <div class="link" role="status" aria-label="Соединение защищено">
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="link-txt"><b>SECURE</b><span id="linkNode">ru-07 · 24&nbsp;мс</span></span>
+    </div>
   </header>
 
   <main>
     <section class="hero" aria-labelledby="h1">
-      <span class="emb hero-emb" aria-hidden="true"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span>
       <p class="eyebrow"><svg><use href="#i-shield"/></svg>Сессия зашифрована</p>
       <h1 id="h1">Панель управления</h1>
       <div class="me">
@@ -91,28 +101,46 @@
       </dl>
     </section>
 
+    <section class="probe" aria-labelledby="h-probe">
+      <h2 class="sec" id="h-probe"><span>Поиск цели</span><span class="cnt">OSINT</span></h2>
+      <form class="probe-box" id="probe" novalidate autocomplete="off">
+        <p class="ds probe-ds">Введи ник, номер или ID, и&nbsp;панель соберёт всё, что найдёт о&nbsp;человеке</p>
+        <label class="sr" for="target">Ник, номер телефона или ID</label>
+        <div class="probe-row">
+          <input id="target" name="target" type="text" placeholder="@username или номер" maxlength="40" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="probeHint">
+          <button class="probe-go" type="submit">Пробить</button>
+        </div>
+        <p class="probe-hint" id="probeHint" aria-live="polite"></p>
+        <div class="probe-run" id="probeRun" hidden>
+          <div class="probe-head"><span id="probeTarget"></span><span id="probePct">0%</span></div>
+          <div class="probe-bar"><span id="probeBar"></span></div>
+          <ol class="probe-log" id="probeLog"></ol>
+        </div>
+      </form>
+    </section>
+
     <section class="term" aria-labelledby="h-term">
-      <h2 class="sec" id="h-term"><span>Терминал</span><span class="live"><i aria-hidden="true"></i>live</span></h2>
+      <h2 class="sec" id="h-term"><span>Терминал</span><span class="live"><svg class="ecg" viewBox="0 0 64 16" aria-hidden="true"><path class="ecg-base" d="M0 8h18l3-6 5 12 4-10 3 4h31"/><path class="ecg-pulse" d="M0 8h18l3-6 5 12 4-10 3 4h31"/></svg>live</span></h2>
       <div class="term-box">
         <ol class="term-log" id="termLog" aria-live="off"></ol>
       </div>
     </section>
 
     <section aria-labelledby="h-mod">
-      <h2 class="sec" id="h-mod"><span>Модули</span><span>06</span></h2>
+      <h2 class="sec" id="h-mod"><span>Модули</span><span class="cnt">07</span></h2>
       <div class="grid">
         <button class="card c-blue" type="button" data-mod="Снести аккаунт Telegram">
           <span class="ic"><svg><use href="#i-userx"/></svg></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
           <span class="tt">Снести аккаунт Telegram</span>
-          <span class="mt">MOD-01 · admin</span>
+          <span class="ds">Блокирует аккаунт по&nbsp;нику или номеру</span>
           <img class="orn" src="img/orn-cross.svg" alt="" width="1600" height="1600" loading="lazy">
         </button>
         <button class="card c-green" type="button" data-mod="Снести аккаунт WhatsApp">
           <span class="ic"><svg><use href="#i-chatx"/></svg></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
           <span class="tt">Снести аккаунт WhatsApp</span>
-          <span class="mt">MOD-02 · admin</span>
+          <span class="ds">Отключает номер в&nbsp;WhatsApp навсегда</span>
           <img class="orn" src="img/orn-cross.svg" alt="" width="1600" height="1600" loading="lazy">
         </button>
 
@@ -122,7 +150,7 @@
             <span class="ic"><svg><use href="#i-term"/></svg></span>
             <div>
               <h3 class="tt" id="h-hack">Взломать аккаунт</h3>
-              <span class="mt">MOD-03 · admin · 4 платформы</span>
+              <span class="ds">Вход в&nbsp;чужой аккаунт без пароля. Выбери платформу</span>
             </div>
             <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
           </div>
@@ -131,21 +159,33 @@
             <button class="chip" type="button" data-mod="Взлом WhatsApp">WhatsApp</button>
             <button class="chip" type="button" data-mod="Взлом Likee">Likee</button>
             <button class="chip" type="button" data-mod="Взлом TikTok">TikTok</button>
+            <button class="chip" type="button" data-mod="Взлом Instagram">Instagram</button>
+            <button class="chip" type="button" data-mod="Взлом ВКонтакте">ВКонтакте</button>
           </div>
         </article>
+
+        <button class="card c-icloud wide row" type="button" data-mod="Доступ к галерее через iCloud">
+          <span class="ic"><svg><use href="#i-cloud"/></svg></span>
+          <span class="row-txt">
+            <span class="tt">Доступ к&nbsp;галерее через iCloud</span>
+            <span class="ds">Открывает фото и&nbsp;видео с&nbsp;чужого iPhone</span>
+          </span>
+          <svg class="lk lk-row" aria-hidden="true"><use href="#i-lock"/></svg>
+          <img class="orn" src="img/orn-cross.svg" alt="" width="1600" height="1600" loading="lazy">
+        </button>
 
         <button class="card c-red" type="button" data-mod="Пробить по ID-номеру">
           <span class="ic"><svg><use href="#i-scan"/></svg></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
           <span class="tt">Пробить по&nbsp;ID-номеру</span>
-          <span class="mt">MOD-04 · admin</span>
+          <span class="ds">Находит имя, номер и&nbsp;все соцсети человека</span>
           <img class="orn" src="img/orn-cross.svg" alt="" width="1600" height="1600" loading="lazy">
         </button>
         <button class="card c-amber" type="button" data-mod="Накрутка соцсетей">
           <span class="ic"><svg><use href="#i-trend"/></svg></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
           <span class="tt">Накрутка соцсетей</span>
-          <span class="mt">MOD-05 · admin</span>
+          <span class="ds">Подписчики, лайки и&nbsp;просмотры за&nbsp;минуты</span>
           <img class="orn" src="img/orn-cross.svg" alt="" width="1600" height="1600" loading="lazy">
         </button>
 
@@ -153,7 +193,7 @@
           <span class="ic"><svg><use href="#i-db"/></svg></span>
           <span class="row-txt">
             <span class="tt">База данных</span>
-            <span class="mt">MOD-06 · записей: ••••••</span>
+            <span class="ds">Поиск по&nbsp;слитым базам: номер, ник, адрес</span>
           </span>
           <svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>
           <img class="orn" src="img/orn-cross.svg" alt="" width="1600" height="1600" loading="lazy">
@@ -161,52 +201,105 @@
       </div>
     </section>
 
+    <section aria-labelledby="h-radar">
+      <h2 class="sec" id="h-radar"><span>Сканер сети</span><span class="cnt" id="radarCount">7</span></h2>
+      <button class="card radar" type="button" data-mod="Сканер устройств рядом">
+        <span class="scope" aria-hidden="true"><span class="sweep"></span><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="radar-txt">
+          <span class="tt">Устройства рядом</span>
+          <span class="ds">Показывает телефоны и&nbsp;гаджеты вокруг тебя. Нажми, чтобы подключиться</span>
+          <span class="radar-now" id="radarNow">iPhone 15 Pro · −48 dBm</span>
+        </span>
+      </button>
+    </section>
+
+    <section aria-labelledby="h-spy">
+      <h2 class="sec" id="h-spy"><span>Слежка</span><span class="cnt">07</span></h2>
+      <div class="list">
+        <button class="item" type="button" data-mod="Чтение переписки">
+          <span class="ic t-blue"><svg><use href="#i-chats"/></svg></span>
+          <span class="item-txt"><span class="tt">Чтение переписки</span><span class="ds">Показывает чаты Telegram и&nbsp;WhatsApp без входа</span></span>
+          <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
+        </button>
+        <button class="item" type="button" data-mod="Прослушка звонков">
+          <span class="ic t-red"><svg><use href="#i-mic"/></svg></span>
+          <span class="item-txt"><span class="tt">Прослушка звонков</span><span class="ds">Записывает разговоры по&nbsp;номеру телефона</span></span>
+          <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
+        </button>
+        <button class="item" type="button" data-mod="Восстановление удалённого">
+          <span class="ic t-amber"><svg><use href="#i-restore"/></svg></span>
+          <span class="item-txt"><span class="tt">Восстановить удалённое</span><span class="ds">Возвращает стёртые сообщения и&nbsp;фото</span></span>
+          <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
+        </button>
+        <button class="item" type="button" data-mod="Отслеживание онлайна">
+          <span class="ic t-green"><svg><use href="#i-pulse"/></svg></span>
+          <span class="item-txt"><span class="tt">Отслеживание онлайна</span><span class="ds">Пишет тебе, когда человек заходит в&nbsp;сеть</span></span>
+          <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
+        </button>
+        <button class="item" type="button" data-mod="Клон SIM-карты">
+          <span class="ic t-copper"><svg><use href="#i-sim"/></svg></span>
+          <span class="item-txt"><span class="tt">Клон SIM-карты</span><span class="ds">Копирует номер на&nbsp;другой телефон</span></span>
+          <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
+        </button>
+        <button class="item" type="button" data-mod="Камеры наблюдения">
+          <span class="ic t-teal"><svg><use href="#i-cam"/></svg></span>
+          <span class="item-txt"><span class="tt">Камеры наблюдения</span><span class="ds">Подключается к&nbsp;камерам во&nbsp;дворах и&nbsp;подъездах</span></span>
+          <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
+        </button>
+        <button class="item" type="button" data-mod="Скрытые фото с камеры">
+          <span class="ic t-crimson"><svg><use href="#i-eye"/></svg></span>
+          <span class="item-txt"><span class="tt">Скрытое фото с&nbsp;камеры</span><span class="ds">Делает снимок с&nbsp;фронталки без звука и&nbsp;вспышки</span></span>
+          <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
+        </button>
+      </div>
+    </section>
+
     <section aria-labelledby="h-elite">
-      <h2 class="sec" id="h-elite"><span>Elite-модули</span><span class="elite">ELITE</span></h2>
+      <h2 class="sec" id="h-elite"><span>Elite-модули</span><span class="cnt elite">ELITE</span></h2>
       <div class="list">
         <button class="item ghost" type="button" data-mod="Режим призрака" role="switch" aria-checked="false" id="ghost">
           <span class="ic t-gold"><svg><use href="#i-ghost"/></svg></span>
-          <span class="item-txt"><span class="tt">Режим призрака</span><span class="mt">скрыть следы · VPN-цепочка 3×</span></span>
+          <span class="item-txt"><span class="tt">Режим призрака</span><span class="ds">Прячет твой IP и&nbsp;следы входа</span></span>
           <span class="sw" aria-hidden="true"><span></span></span>
         </button>
         <button class="item" type="button" data-mod="Перехват SMS и кодов">
           <span class="ic t-blue"><svg><use href="#i-msg"/></svg></span>
-          <span class="item-txt"><span class="tt">Перехват SMS и&nbsp;кодов</span><span class="mt">EL-01 · root</span></span>
+          <span class="item-txt"><span class="tt">Перехват SMS и&nbsp;кодов</span><span class="ds">Читает коды входа, которые приходят на&nbsp;чужой номер</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
         <button class="item" type="button" data-mod="Геолокация по номеру">
           <span class="ic t-red"><svg><use href="#i-pin"/></svg></span>
-          <span class="item-txt"><span class="tt">Геолокация по&nbsp;номеру</span><span class="mt">EL-02 · root</span></span>
+          <span class="item-txt"><span class="tt">Геолокация по&nbsp;номеру</span><span class="ds">Показывает, где сейчас телефон человека</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
         <button class="item" type="button" data-mod="Удалённый доступ к телефону">
           <span class="ic t-green"><svg><use href="#i-phone"/></svg></span>
-          <span class="item-txt"><span class="tt">Удалённый доступ к&nbsp;телефону</span><span class="mt">EL-03 · root</span></span>
+          <span class="item-txt"><span class="tt">Удалённый доступ к&nbsp;телефону</span><span class="ds">Камера, микрофон и&nbsp;файлы чужого телефона</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
         <button class="item" type="button" data-mod="Обход двухфакторной защиты">
           <span class="ic t-amber"><svg><use href="#i-key"/></svg></span>
-          <span class="item-txt"><span class="tt">Обход 2FA</span><span class="mt">EL-04 · root</span></span>
+          <span class="item-txt"><span class="tt">Обход 2FA</span><span class="ds">Вход без второго кода подтверждения</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
         <button class="item" type="button" data-mod="DDoS-атака">
           <span class="ic t-crimson"><svg><use href="#i-bolt"/></svg></span>
-          <span class="item-txt"><span class="tt">DDoS-атака</span><span class="mt">EL-05 · ботнет 40k</span></span>
+          <span class="item-txt"><span class="tt">DDoS-атака</span><span class="ds">Кладёт сайт или сервер на&nbsp;несколько часов</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
         <button class="item" type="button" data-mod="Деанон по фото">
           <span class="ic t-teal"><svg><use href="#i-eye"/></svg></span>
-          <span class="item-txt"><span class="tt">Деанон по&nbsp;фото</span><span class="mt">EL-06 · root</span></span>
+          <span class="item-txt"><span class="tt">Деанон по&nbsp;фото</span><span class="ds">Находит человека по&nbsp;одной фотографии</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
         <button class="item" type="button" data-mod="Взлом Wi-Fi">
           <span class="ic t-sky"><svg><use href="#i-wifi"/></svg></span>
-          <span class="item-txt"><span class="tt">Взлом Wi-Fi</span><span class="mt">EL-07 · root</span></span>
+          <span class="item-txt"><span class="tt">Взлом Wi-Fi</span><span class="ds">Подбирает пароль от&nbsp;сети рядом</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
         <button class="item" type="button" data-mod="Подмена номера">
           <span class="ic t-copper"><svg><use href="#i-swap"/></svg></span>
-          <span class="item-txt"><span class="tt">Подмена номера</span><span class="mt">EL-08 · root</span></span>
+          <span class="item-txt"><span class="tt">Подмена номера</span><span class="ds">Звонок или СМС с&nbsp;любого номера</span></span>
           <svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>
         </button>
       </div>
@@ -226,7 +319,8 @@
     </div>
     <div class="ring" aria-hidden="true">
       <svg class="spin" viewBox="0 0 86 86"><circle cx="43" cy="43" r="41"/></svg>
-      <svg class="ico"><use href="#i-lock"/></svg>
+      <svg class="ico ico-lock"><use href="#i-lock"/></svg>
+      <svg class="ico ico-ok"><use href="#i-ok"/></svg>
     </div>
     <div class="phases">
       <div class="phase phase-check">
@@ -238,7 +332,19 @@
         <p class="code">ERROR 403 · ACCESS DENIED</p>
         <h2 class="t glitch" id="denyTitle" data-text="Доступ закрыт">Доступ закрыт</h2>
         <p class="msg" id="denyMsg">Доступ пока имеет только администратор <b>Типл</b></p>
-        <button class="btn" type="button" id="denyOk">Понятно</button>
+        <p class="price-line" id="denyPrice" hidden>Стоимость модуля <b></b></p>
+        <div class="buy" id="buyNote" hidden>
+          <p class="buy-txt">Свяжитесь с <b>Ханакеном</b> для покупки доступа</p>
+        </div>
+        <button class="btn btn-buy" type="button" id="buyBtn">Купить доступ</button>
+        <button class="btn btn-ghost" type="button" id="denyOk">Понятно</button>
+      </div>
+      <div class="phase phase-grant">
+        <p class="code" id="okCode">ACCESS GRANTED · ROOT</p>
+        <h2 class="t" id="okTitle">Готово</h2>
+        <p class="msg" id="okMsg"></p>
+        <div class="vis" id="okVis"></div>
+        <button class="btn" type="button" id="okBtn">Закрыть</button>
       </div>
     </div>
   </div>
