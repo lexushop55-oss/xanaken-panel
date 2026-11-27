@@ -449,10 +449,27 @@
     // Только живой юзернейм: латиница, цифры и _, без пробелов и эмодзи
     const clean = (s) => s.replace(/[^a-zA-Z0-9_@]/g, '').replace(/@(?=.)/g, (m, i) => i === 0 ? '@' : '').replace(/(?!^)@/g, '');
     // Правила юзернейма Telegram: 5–32 знака, начинается с буквы, не кончается на _, без двойных _
-    const validUser = (s) => {
+    const validFormat = (u) => /^[a-zA-Z][a-zA-Z0-9_]{3,30}[a-zA-Z0-9]$/.test(u) && u.indexOf('__') === -1;
+    // Похоже ли на живой ник, а не на случайный набор букв и цифр
+    const KBD = ['qwe', 'wer', 'ert', 'rty', 'tyu', 'yui', 'uio', 'iop', 'asd', 'sdf', 'dfg', 'fgh', 'ghj', 'hjk', 'jkl', 'zxc', 'xcv', 'cvb', 'vbn', 'bnm', 'poiu', 'lkjh', 'mnbv'];
+    const DIGITS = ['1234', '2345', '3456', '4567', '5678', '6789', '7890', '0123', '9876', '8765', '7654', '6543', '5432', '4321', '3210'];
+    const looksReal = (u) => {
+      u = u.toLowerCase();
+      const letters = u.replace(/[^a-z]/g, '');
+      if (/^[0-9_]+$/.test(u)) return false;                       // только цифры и подчёркивания
+      if (u.replace(/[^0-9]/g, '').length / u.length > 0.5) return false; // больше половины цифр
+      if (/(.)\1\1/.test(u)) return false;                         // три одинаковых знака подряд
+      if (DIGITS.some((k) => u.indexOf(k) !== -1)) return false;   // ряды цифр (1234)
+      if (KBD.some((k) => letters.indexOf(k) !== -1)) return false; // клавиатурные ряды (qwe, asd, zxc)
+      if (!/[aeiouy]/.test(letters) && letters.length > 5) return false; // длинные буквы без гласных — набор
+      return true;
+    };
+    // true — можно пробивать; иначе возвращает текст ошибки
+    const checkUser = (s) => {
       const u = s.replace(/^@/, '');
-      if (!/^[a-zA-Z][a-zA-Z0-9_]{3,30}[a-zA-Z0-9]$/.test(u)) return false;
-      if (u.indexOf('__') !== -1) return false;
+      if (!s) return 'Введите юзернейм цели, например @durov';
+      if (!validFormat(u)) return 'Введите корректный юзернейм, например @durov';
+      if (!looksReal(u)) return 'Это не похоже на юзернейм. Введите корректный юз';
       return true;
     };
     input.addEventListener('input', () => {
@@ -464,9 +481,10 @@
       e.preventDefault();
       if (probing) return;
       const v = input.value.trim();
-      if (!validUser(v)) {
+      const check = checkUser(v);
+      if (check !== true) {
         input.setAttribute('aria-invalid', 'true');
-        hint.textContent = v ? 'Это не похоже на живой юзернейм. Пример: @durov' : 'Введите юзернейм цели, например @durov';
+        hint.textContent = check;
         haptic('notify', 'warning');
         input.focus();
         return;
