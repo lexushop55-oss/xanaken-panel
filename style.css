@@ -255,23 +255,14 @@ dialog.in .sheet{transform:none}
 .ring{width:78px;height:78px;margin:0 auto 14px;display:grid;place-items:center;border-radius:50%;color:var(--gold);
   background:radial-gradient(circle,rgba(233,199,126,.16),#101115 70%);border:1px solid rgba(233,199,126,.3);
   transition:background-color .3s,border-color .3s,color .3s}
-.ring .spin{position:absolute;width:90px;height:90px;stroke:url(#g-gold);stroke-width:2;stroke-dasharray:60 210;animation:rot .9s linear infinite;transition:opacity .2s}
 .ring .ico{width:28px;height:28px}
 .denied .ring{color:#fff;border-color:rgba(255,74,92,.7);background:radial-gradient(circle,#e0344b,#7a0f1f 75%);animation:shake .45s var(--ease)}
-.denied .ring .spin{opacity:0}
 .denied .ring::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:2px solid rgba(255,74,92,.6);animation:pulse 1.6s ease-out infinite}
 
-.phases{display:grid}
-.phase{grid-area:1/1;transition:opacity .22s var(--ease),transform .22s var(--ease),visibility 0s}
-.phase-deny{opacity:0;visibility:hidden;transform:translateY(8px)}
-.denied .phase-check{opacity:0;visibility:hidden;transform:translateY(-8px)}
-.denied .phase-deny{opacity:1;visibility:visible;transform:none}
+.phase-deny{display:none}
+.denied .phase-deny{display:block}
 .code{font:500 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
-.phase-deny .code{color:#ff7a88}
 .t{margin:6px 0 8px;font-size:24px;font-weight:800;line-height:1.15;letter-spacing:-.01em}
-.steps{list-style:none;padding:0;margin:8px auto 0;width:fit-content;text-align:left;font:500 12px/1.8 var(--mono);color:var(--muted)}
-.steps li{animation:lineIn .24s var(--ease) both}
-.steps li::before{content:"› ";color:var(--gold)}
 .msg{max-width:30ch;margin:0 auto 18px;font-size:15.5px;line-height:1.45;color:#d9d4cb;text-wrap:balance}
 .msg b{color:var(--gold);font-weight:800}
 .btn{position:relative;overflow:hidden;display:block;width:100%;height:54px;border:0;border-radius:16px;cursor:pointer;background:var(--gold-grad);color:#1a1408;
@@ -423,7 +414,8 @@ dialog.in .sheet{transform:none}
 .card>.price{margin-top:auto}
 .card .tt+.ds+.price,.card .tt+.price{margin-top:12px}
 .feature{position:relative}
-.feature .price{position:absolute;top:14px;right:40px;margin:0}
+.chip .price{display:table;margin:5px auto 0;padding:3px 6px;font-size:11px}
+#h-probe .price{margin:0}
 .item .price,.row-txt .price,.radar-txt .price{margin-top:6px}
 .c-icloud .price,.row .price{align-self:center}
 .feature .ic{align-self:flex-start}
@@ -431,15 +423,13 @@ dialog.in .sheet{transform:none}
 /* кольцо: галочка для ROOT */
 .ico-ok{display:none;width:30px;height:30px;stroke-width:2.4}
 .granted .ring{color:#07100b;border-color:rgba(61,220,151,.7);background:radial-gradient(circle,#6ff0ad,#14a059 76%);animation:none}
-.granted .ring .spin{opacity:0}
 .granted .ring .ico-lock{display:none}
 .granted .ring .ico-ok{display:block;animation:pop .4s var(--spring) both}
 .granted .ring::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:2px solid rgba(61,220,151,.5);animation:pulse 1.6s ease-out infinite}
 
-/* фаза успеха */
-.phase-grant{opacity:0;visibility:hidden;transform:translateY(8px)}
-.granted .phase-check,.granted .phase-deny{opacity:0;visibility:hidden;transform:translateY(-8px)}
-.granted .phase-grant{opacity:1;visibility:visible;transform:none}
+/* результат ROOT */
+.phase-grant{display:none}
+.granted .phase-grant{display:block}
 .phase-grant .code{color:#5fe3a0}
 .granted .glitch::before,.granted .glitch::after{display:none}
 .vis{margin:4px 0 18px}
@@ -522,7 +512,7 @@ dialog.in .sheet{transform:none}
 :root{--disp:"Unbounded",var(--sans)}
 
 /* старое, что больше не используется */
-.wm,.sub,.eyebrow,.stats,.brand,.emb-sm,.price{display:none!important}
+.wm,.sub,.eyebrow,.stats,.brand,.emb-sm{display:none!important}
 
 /* фон: только чёрный и эмблема */
 body{background:#000}

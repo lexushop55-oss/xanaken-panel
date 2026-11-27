@@ -20,11 +20,6 @@
 </head>
 <body>
 <svg class="sprite" aria-hidden="true" focusable="false">
-  <defs>
-    <linearGradient id="g-gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f8e3ae"/><stop offset=".5" stop-color="#e2bb6c"/><stop offset="1" stop-color="#a37b37"/>
-    </linearGradient>
-  </defs>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect width="16" height="11" x="4" y="11" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.810 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
   <symbol id="i-userx" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 8 5 5M22 8l-5 5"/></symbol>
@@ -360,20 +355,13 @@
       <span class="emb sheet-emb"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span>
     </div>
     <div class="ring" aria-hidden="true">
-      <svg class="spin" viewBox="0 0 86 86"><circle cx="43" cy="43" r="41"/></svg>
       <svg class="ico ico-lock"><use href="#i-lock"/></svg>
       <svg class="ico ico-ok"><use href="#i-ok"/></svg>
     </div>
     <div class="phases">
-      <div class="phase phase-check">
-        <p class="code" id="denyMod">module</p>
-        <p class="t">Проверка доступа…</p>
-        <ul class="steps" id="steps"></ul>
-      </div>
       <div class="phase phase-deny">
-        <p class="code">ERROR 403 · ACCESS DENIED</p>
         <h2 class="t glitch" id="denyTitle" data-text="Доступ закрыт">Доступ закрыт</h2>
-        <p class="msg" id="denyMsg">Доступ пока имеет только администратор <b>Типл</b></p>
+        <p class="msg" id="denyMsg">Доступ есть только у администратора <b>Ханакена</b>.</p>
         <button class="btn" type="button" id="denyOk">Понятно</button>
       </div>
       <div class="phase phase-grant">

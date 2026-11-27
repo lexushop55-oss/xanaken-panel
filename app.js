@@ -188,15 +188,11 @@
     });
   }
 
-  // Проверка доступа и отказ
+  // Окно модуля
   const dlg = $('#deny');
-  const mod = $('#denyMod');
-  const steps = $('#steps');
   const ok = $('#denyOk');
   const ghost = $('#ghost');
-  let timers = [];
   let opener = null;
-  const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
 
   // Режим администратора: только для одного Telegram ID (в коде лежит его хеш, а не сам ID)
   const ADMIN_HASH = 'e9a2b2551cd6398421740c418dc51a345affb6ba2832770ad5ec60403690d7ab';
@@ -268,6 +264,46 @@
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
   const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
+  const prices = {
+    'Снести аккаунт Telegram': 12000,
+    'Снести аккаунт WhatsApp': 12000,
+    'Взлом Telegram': 15000,
+    'Взлом WhatsApp': 15000,
+    'Взлом Likee': 9000,
+    'Взлом TikTok': 12000,
+    'Взлом Instagram': 15000,
+    'Взлом ВКонтакте': 13000,
+    'Доступ к галерее через iCloud': 18000,
+    'Пробить по ID-номеру': 6500,
+    'Пробив цели': 6500,
+    'Накрутка соцсетей': 5000,
+    'База данных': 9000,
+    'Сканер устройств рядом': 5000,
+    'Режим призрака': 5000,
+    'Перехват SMS и кодов': 20000,
+    'Геолокация по номеру': 8000,
+    'Удалённый доступ к телефону': 25000,
+    'Обход двухфакторной защиты': 15000,
+    'DDoS-атака': 30000,
+    'Деанон по фото': 9500,
+    'Взлом Wi-Fi': 7000,
+    'Подмена номера': 6000,
+    'Чтение переписки': 14000,
+    'Прослушка звонков': 22000,
+    'Восстановление удалённого': 5500,
+    'Отслеживание онлайна': 5000,
+    'Клон SIM-карты': 16000,
+    'Камеры наблюдения': 11000,
+    'Скрытые фото с камеры': 13000
+  };
+  const priceTag = (amount) => el('span', 'price', fmt(amount) + ' ₽');
+  const modules = document.querySelectorAll('[data-mod]');
+  modules.forEach((button) => {
+    const host = button.querySelector('.row-txt, .item-txt, .radar-txt') || button;
+    host.appendChild(priceTag(prices[button.dataset.mod]));
+  });
+  $('#h-probe').appendChild(priceTag(prices['Пробив цели']));
+
   const buildVis = (r, extra) => {
     okVis.textContent = '';
     if (r.v === 'gallery') {
@@ -308,8 +344,8 @@
   const showDenied = () => {
     dlg.classList.add('denied');
     dlg.setAttribute('aria-labelledby', 'denyTitle');
+    dlg.setAttribute('aria-describedby', 'denyMsg');
     haptic('notify', 'error');
-    ok.focus({ preventScroll: true });
   };
   const showGranted = (name, extra) => {
     const r = resultFor(name);
@@ -318,41 +354,24 @@
     buildVis(r, extra);
     dlg.classList.add('granted');
     dlg.setAttribute('aria-labelledby', 'okTitle');
+    dlg.setAttribute('aria-describedby', 'okMsg');
     haptic('notify', 'success');
-    okBtn.focus({ preventScroll: true });
   };
 
   const openDeny = (name, from, extra) => {
-    clearTimers();
     opener = from || null;
-    const grant = admin;
     haptic('impact', 'medium');
-    mod.textContent = 'Модуль · ' + name;
-    steps.textContent = '';
     dlg.classList.remove('denied', 'granted', 'in');
+    if (admin) showGranted(name, extra);
+    else showDenied();
     if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); }
     else dlg.setAttribute('open', '');
+    (admin ? okBtn : ok).focus({ preventScroll: true });
     requestAnimationFrame(() => requestAnimationFrame(() => dlg.classList.add('in')));
     if (can('6.1')) { try { tg.BackButton.show(); } catch (e) {} }
-
-    const finish = () => (grant ? showGranted(name, extra) : showDenied());
-    if (reduce) { finish(); return; }
-    const seq = grant
-      ? ['запрос к модулю', 'проверка ключа', 'уровень доступа: ROOT', 'выполнение…']
-      : ['запрос к модулю', 'проверка ключа', 'уровень доступа: GUEST'];
-    seq.forEach((txt, i) => {
-      timers.push(setTimeout(() => {
-        const li = document.createElement('li');
-        li.textContent = txt;
-        steps.appendChild(li);
-        haptic('select');
-      }, 240 + i * 300));
-    });
-    timers.push(setTimeout(finish, 240 + seq.length * 300 + (grant ? 500 : 160)));
   };
 
   const closeDeny = () => {
-    clearTimers();
     if (!dlg.open) return;
     const wasGrant = dlg.classList.contains('granted');
     dlg.classList.remove('in');
@@ -498,15 +517,10 @@
     if (rCount) rCount.textContent = String(rnd(6, 9));
   }, 1600);
 
-  document.querySelectorAll('[data-mod]').forEach((el) => {
-    el.addEventListener('click', () => {
-      if (el === ghost) {
-        ghost.setAttribute('aria-checked', 'true');
-        haptic('select');
-        timers.push(setTimeout(() => openDeny(el.dataset.mod, el), reduce ? 0 : 380));
-        return;
-      }
-      openDeny(el.dataset.mod, el);
+  modules.forEach((button) => {
+    button.addEventListener('click', () => {
+      if (button === ghost) ghost.setAttribute('aria-checked', 'true');
+      openDeny(button.dataset.mod, button);
     });
   });
 
