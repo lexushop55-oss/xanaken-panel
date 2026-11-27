@@ -1,6 +1,8 @@
 (() => {
   'use strict';
 
+  document.documentElement.classList.add('js');
+
   const $ = (s) => document.querySelector(s);
   let tg;
   const can = (v) => {
@@ -18,6 +20,60 @@
       else h.selectionChanged();
     } catch (e) {}
   };
+
+  // Расшифровка текста: символы перебираются и встают на место слева направо
+  const GLYPHS = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯXZQ0123456789#$%&@';
+  const scramble = (el, ms) => {
+    if (!el || reduce) return;
+    const final = el.textContent;
+    // на время перебора держим высоту, чтобы случайные широкие буквы не двигали экран
+    el.style.height = el.offsetHeight + 'px';
+    el.style.overflow = 'hidden';
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / ms);
+      const fixed = Math.floor(p * final.length);
+      let out = final.slice(0, fixed);
+      for (let i = fixed; i < final.length; i++) {
+        out += final[i] === ' ' ? ' ' : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      }
+      el.textContent = out;
+      if (p < 1) requestAnimationFrame(step);
+      else { el.textContent = final; el.style.height = ''; el.style.overflow = ''; }
+    };
+    requestAnimationFrame(step);
+  };
+
+  // Заставка при входе и появление экрана. Telegram SDK грузится отдельно и её не задерживает
+  const boot = $('#boot');
+  let shown = false;
+  const show = () => {
+    if (shown) return;
+    shown = true;
+    document.body.classList.add('shown');
+    scramble($('#h1'), 750);
+  };
+  const hideBoot = () => {
+    if (!boot || !boot.isConnected) { show(); return; }
+    boot.classList.add('out');
+    show();
+    setTimeout(() => boot.remove(), 320);
+  };
+  // Время считаем от начала загрузки страницы: если страница грузилась долго,
+  // часть заставки уже прошла на CSS-анимации
+  const BOOT_MS = 1950;
+  const elapsed = performance.now();
+  if (boot) {
+    if (reduce || elapsed >= BOOT_MS + 500) { boot.remove(); show(); }
+    else {
+      if (elapsed < 600) scramble($('#bootLogo'), 900);
+      boot.addEventListener('click', hideBoot, { once: true });
+      boot.addEventListener('animationend', (e) => {
+        if (e.target === boot && e.animationName === 'bootAway') boot.remove();
+      });
+      setTimeout(show, Math.max(0, BOOT_MS - elapsed));
+    }
+  } else show();
 
   // Пинг
   const ping = $('#ping');
