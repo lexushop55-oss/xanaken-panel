@@ -446,16 +446,27 @@
     const ptarget = $('#probeTarget');
     const go = form.querySelector('.probe-go');
     let probing = false;
+    // Только живой юзернейм: латиница, цифры и _, без пробелов и эмодзи
+    const clean = (s) => s.replace(/[^a-zA-Z0-9_@]/g, '').replace(/@(?=.)/g, (m, i) => i === 0 ? '@' : '').replace(/(?!^)@/g, '');
+    // Правила юзернейма Telegram: 5–32 знака, начинается с буквы, не кончается на _, без двойных _
+    const validUser = (s) => {
+      const u = s.replace(/^@/, '');
+      if (!/^[a-zA-Z][a-zA-Z0-9_]{3,30}[a-zA-Z0-9]$/.test(u)) return false;
+      if (u.indexOf('__') !== -1) return false;
+      return true;
+    };
     input.addEventListener('input', () => {
+      const c = clean(input.value);
+      if (c !== input.value) input.value = c;
       if (input.hasAttribute('aria-invalid')) { input.removeAttribute('aria-invalid'); hint.textContent = ''; }
     });
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (probing) return;
       const v = input.value.trim();
-      if (v.length < 3) {
+      if (!validUser(v)) {
         input.setAttribute('aria-invalid', 'true');
-        hint.textContent = 'Введите ник, номер телефона или ID';
+        hint.textContent = v ? 'Это не похоже на живой юзернейм. Пример: @durov' : 'Введите юзернейм цели, например @durov';
         haptic('notify', 'warning');
         input.focus();
         return;

@@ -105,10 +105,10 @@
     <section class="probe" aria-labelledby="h-probe">
       <h2 class="sec" id="h-probe"><span>Поиск цели</span><span class="cnt">OSINT</span></h2>
       <form class="probe-box" id="probe" novalidate autocomplete="off">
-        <p class="ds probe-ds">Введи ник, номер или ID, и&nbsp;панель соберёт всё, что найдёт о&nbsp;человеке</p>
-        <label class="sr" for="target">Ник, номер телефона или ID</label>
+        <p class="ds probe-ds">Введи живой юзернейм цели, и&nbsp;панель соберёт всё, что найдёт о&nbsp;человеке</p>
+        <label class="sr" for="target">Юзернейм цели</label>
         <div class="probe-row">
-          <input id="target" name="target" type="text" placeholder="@username или номер" maxlength="40" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="probeHint">
+          <input id="target" name="target" type="text" placeholder="@username" maxlength="33" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="probeHint">
           <button class="probe-go" type="submit">Пробить</button>
         </div>
         <p class="probe-hint" id="probeHint" aria-live="polite"></p>
