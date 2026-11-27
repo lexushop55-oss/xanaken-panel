@@ -411,9 +411,22 @@
     buyBtn.hidden = true;
     haptic('impact', 'light');
     ok.textContent = 'Понятно';
-    ok.focus({ preventScroll: true });
+    const cb = $('#contactBtn');
+    if (cb) cb.focus({ preventScroll: true }); else ok.focus({ preventScroll: true });
     buyNote.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
   });
+
+  // Связаться с Ханакеном: внутри Telegram открываем чат его же средствами
+  const contactBtn = $('#contactBtn');
+  if (contactBtn) {
+    contactBtn.addEventListener('click', (e) => {
+      haptic('impact', 'light');
+      if (can('6.1') && tg.openTelegramLink) {
+        e.preventDefault();
+        try { tg.openTelegramLink(contactBtn.href); } catch (err) { window.open(contactBtn.href, '_blank'); }
+      }
+    });
+  }
 
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeDeny(); });
   dlg.addEventListener('click', (e) => { if (e.target === dlg) closeDeny(); });
