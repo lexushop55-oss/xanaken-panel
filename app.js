@@ -1,22 +1,13 @@
 (() => {
   'use strict';
 
-  document.documentElement.classList.add('js');
-
   const $ = (s) => document.querySelector(s);
-  const tg = window.Telegram && window.Telegram.WebApp;
+  let tg;
   const can = (v) => {
     try { return !!(tg && tg.isVersionAtLeast && tg.isVersionAtLeast(v)); } catch (e) { return false; }
   };
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const BG = '#000000';
-
-  if (tg) {
-    try { tg.ready(); tg.expand(); } catch (e) {}
-    if (can('6.1')) { try { tg.setHeaderColor(BG); tg.setBackgroundColor(BG); } catch (e) {} }
-    if (can('7.10')) { try { tg.setBottomBarColor(BG); } catch (e) {} }
-    if (can('7.7')) { try { tg.disableVerticalSwipes(); } catch (e) {} }
-  }
 
   const haptic = (kind, style) => {
     if (!can('6.1')) return;
@@ -27,69 +18,6 @@
       else h.selectionChanged();
     } catch (e) {}
   };
-
-  const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-  if (u) {
-    const name = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
-    $('#meName').textContent = name || (u.username ? '@' + u.username : 'Гость');
-    $('#meId').textContent = 'ID ' + u.id + (u.username ? ' · @' + u.username : '');
-    $('#ava').textContent = (name || u.username || 'X').charAt(0).toUpperCase();
-  }
-
-  // Расшифровка текста: символы перебираются и встают на место слева направо
-  const GLYPHS = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЭЮЯXZQ0123456789#$%&@';
-  const scramble = (el, ms) => {
-    if (!el || reduce) return;
-    const final = el.textContent;
-    // на время перебора держим высоту, чтобы случайные широкие буквы не двигали экран
-    el.style.height = el.offsetHeight + 'px';
-    el.style.overflow = 'hidden';
-    const start = performance.now();
-    const step = (now) => {
-      const p = Math.min(1, (now - start) / ms);
-      const fixed = Math.floor(p * final.length);
-      let out = final.slice(0, fixed);
-      for (let i = fixed; i < final.length; i++) {
-        out += final[i] === ' ' ? ' ' : GLYPHS[(Math.random() * GLYPHS.length) | 0];
-      }
-      el.textContent = out;
-      if (p < 1) requestAnimationFrame(step);
-      else { el.textContent = final; el.style.height = ''; el.style.overflow = ''; }
-    };
-    requestAnimationFrame(step);
-  };
-
-  // Загрузка и появление экрана
-  const boot = $('#boot');
-  let shown = false;
-  const show = () => {
-    if (shown) return;
-    shown = true;
-    document.body.classList.add('shown');
-    scramble($('#h1'), 750);
-    scramble($('#wordmark'), 600);
-  };
-  const hideBoot = () => {
-    if (!boot || !boot.isConnected) { show(); return; }
-    boot.classList.add('out');
-    show();
-    setTimeout(() => boot.remove(), 320);
-  };
-  // Время считаем от начала загрузки страницы: скрипт Telegram может грузиться долго,
-  // и к этому моменту заставка уже частично прошла
-  const BOOT_MS = 1950;
-  const elapsed = performance.now();
-  if (boot) {
-    if (reduce || elapsed >= BOOT_MS + 500) { boot.remove(); show(); }
-    else {
-      if (elapsed < 600) scramble($('#bootLogo'), 900);
-      boot.addEventListener('click', hideBoot, { once: true });
-      boot.addEventListener('animationend', (e) => {
-        if (e.target === boot && e.animationName === 'bootAway') boot.remove();
-      });
-      setTimeout(show, Math.max(0, BOOT_MS - elapsed));
-    }
-  } else show();
 
   // Пинг
   const ping = $('#ping');
@@ -203,12 +131,6 @@
     document.body.classList.toggle('admin', on);
     if (lvl) lvl.textContent = on ? 'ROOT' : 'Гость';
   };
-  if (u && window.crypto && crypto.subtle && window.TextEncoder) {
-    crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(u.id))).then((buf) => {
-      const hex = Array.from(new Uint8Array(buf)).map((x) => x.toString(16).padStart(2, '0')).join('');
-      if (hex === ADMIN_HASH) setAdmin(true);
-    }).catch(() => {});
-  }
   // Запасной вход для записи видео: 5 быстрых нажатий на эмблему в hero
   const embBtn = $('#embHero');
   let taps = [];
@@ -388,7 +310,6 @@
   dlg.addEventListener('click', (e) => { if (e.target === dlg) closeDeny(); });
   ok.addEventListener('click', closeDeny);
   okBtn.addEventListener('click', closeDeny);
-  if (can('6.1')) { try { tg.BackButton.onClick(closeDeny); } catch (e) {} }
 
   // Поиск цели: введённое никуда не отправляется, только показывается на экране
   const form = $('#probe');
@@ -530,6 +451,7 @@
   const renderBalance = () => balEls.forEach((e) => { if (e) e.innerHTML = fmt(bal) + '&nbsp;₽'; });
   const walletBtn = $('#walletBtn');
   const wdlg = $('#wallet-dlg');
+  let closeWalletFromBack;
   if (walletBtn && wdlg) {
     const depForm = $('#depForm');
     const depDone = $('#depDone');
@@ -564,7 +486,7 @@
     walletBtn.addEventListener('click', openWallet);
     wdlg.addEventListener('cancel', (e) => { e.preventDefault(); closeWallet(); });
     wdlg.addEventListener('click', (e) => { if (e.target === wdlg) closeWallet(); });
-    if (can('6.1')) { try { tg.BackButton.onClick(() => { if (wdlg.open) closeWallet(); }); } catch (e) {} }
+    closeWalletFromBack = closeWallet;
     $('#depClose').addEventListener('click', closeWallet);
 
     // Выбор способа оплаты
@@ -623,4 +545,41 @@
       }, reduce ? 0 : 1500);
     });
   }
+
+  const initTelegram = () => {
+    tg = window.Telegram && window.Telegram.WebApp;
+    if (!tg) return;
+    if (tg) {
+      try { tg.ready(); tg.expand(); } catch (e) {}
+      if (can('6.1')) { try { tg.setHeaderColor(BG); tg.setBackgroundColor(BG); } catch (e) {} }
+      if (can('7.10')) { try { tg.setBottomBarColor(BG); } catch (e) {} }
+      if (can('7.7')) { try { tg.disableVerticalSwipes(); } catch (e) {} }
+    }
+
+    const u = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if (u) {
+      const name = [u.first_name, u.last_name].filter(Boolean).join(' ').trim();
+      $('#meName').textContent = name || (u.username ? '@' + u.username : 'Гость');
+      $('#meId').textContent = 'ID ' + u.id + (u.username ? ' · @' + u.username : '');
+      $('#ava').textContent = (name || u.username || 'X').charAt(0).toUpperCase();
+    }
+
+    if (u && window.crypto && crypto.subtle && window.TextEncoder) {
+      crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(u.id))).then((buf) => {
+        const hex = Array.from(new Uint8Array(buf)).map((x) => x.toString(16).padStart(2, '0')).join('');
+        if (hex === ADMIN_HASH) setAdmin(true);
+      }).catch(() => {});
+    }
+    if (can('6.1')) {
+      try {
+        tg.BackButton.onClick(() => {
+          if (wdlg.open && closeWalletFromBack) closeWalletFromBack();
+          else closeDeny();
+        });
+        if (dlg.open || wdlg.open) tg.BackButton.show();
+      } catch (e) {}
+    }
+  };
+  if (window.Telegram && window.Telegram.WebApp) initTelegram();
+  else $('#telegram-sdk').addEventListener('load', initTelegram, { once: true });
 })();

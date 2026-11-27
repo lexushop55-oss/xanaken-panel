@@ -48,28 +48,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
 
 .wm{position:fixed;inset:-20px;z-index:40;pointer-events:none;background-image:var(--wm);background-size:230px 150px}
 
-/* загрузка */
-.boot{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);
-  animation:bootAway .5s var(--ease) 1.9s forwards}
-.boot.out{animation:bootAway .3s var(--ease) forwards}
-.boot-in{width:min(280px,80vw);text-align:center}
-.emb-xl{width:112px;height:112px;margin-bottom:18px}
-.emb-xl::before{content:"";position:absolute;inset:-30%;border-radius:50%;background:radial-gradient(circle,rgba(233,199,126,.35),transparent 65%);
-  animation:glow 2.2s ease-in-out infinite}
-.boot .emb-ring{animation:ringIn 1.2s var(--ease) both,rot 60s linear 1.2s infinite}
-.boot .emb-cross{animation:crossIn .8s var(--spring) .35s both}
-.boot-logo{font-weight:800;font-size:22px;letter-spacing:.42em;padding-left:.42em;margin-bottom:16px;
-  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.boot-log{font:500 12px/1.75 var(--mono);color:var(--muted);text-align:left;min-height:8.75em}
-.boot-log div{opacity:0;transform:translateY(4px);animation:lineIn .26s var(--ease) forwards}
-.boot-log div:nth-child(1){animation-delay:.25s}
-.boot-log div:nth-child(2){animation-delay:.5s}
-.boot-log div:nth-child(3){animation-delay:.75s}
-.boot-log div:nth-child(4){animation-delay:1s}
-.boot-log div:nth-child(5){animation-delay:1.25s;color:var(--gold)}
 .ok{color:var(--ok)}
-.boot-bar{height:2px;margin-top:14px;border-radius:2px;background:var(--line);overflow:hidden}
-.boot-bar span{display:block;height:100%;background:var(--gold-grad);transform-origin:left;transform:scaleX(0);animation:bar 1.7s var(--ease) .15s forwards}
 
 /* каркас */
 .app{max-width:520px;margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
@@ -207,29 +186,6 @@ button.card:active,.chip:active,.item:active{--s:.97}
   transform:scale(0);opacity:.9;animation:rip .6s var(--ease) forwards}
 .feature .rip,.chip .rip{background:rgba(243,213,143,.55)}
 
-/* появление после загрузки */
-.js body:not(.shown) .card,.js body:not(.shown) .item,.js body:not(.shown) .term-box{opacity:0}
-.shown .hero{animation:lift .6s var(--ease) backwards}
-.shown .term-box{animation:rise .6s var(--ease) .08s backwards}
-.shown .card{animation:rise .55s var(--ease) backwards}
-.shown .grid>:nth-child(1){animation-delay:.14s}
-.shown .grid>:nth-child(2){animation-delay:.19s}
-.shown .grid>:nth-child(3){animation-delay:.24s}
-.shown .grid>:nth-child(4){animation-delay:.29s}
-.shown .grid>:nth-child(5){animation-delay:.34s}
-.shown .grid>:nth-child(6){animation-delay:.39s}
-.shown .grid>:nth-child(7){animation-delay:.44s}
-.shown .item{animation:riseX .5s var(--ease) backwards}
-.shown .item:nth-child(1){animation-delay:.42s}
-.shown .item:nth-child(2){animation-delay:.46s}
-.shown .item:nth-child(3){animation-delay:.5s}
-.shown .item:nth-child(4){animation-delay:.54s}
-.shown .item:nth-child(5){animation-delay:.58s}
-.shown .item:nth-child(6){animation-delay:.62s}
-.shown .item:nth-child(7){animation-delay:.66s}
-.shown .item:nth-child(8){animation-delay:.7s}
-.shown .item:nth-child(9){animation-delay:.74s}
-
 @media (hover:hover){
   .card:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.26),inset 0 -2px 0 rgba(0,0,0,.25),0 20px 34px -14px var(--sh)}
   .chip:hover{background:#2a210d}
@@ -276,12 +232,7 @@ dialog.in .sheet{transform:none}
 .denied .glitch::before{color:#ff2d55;animation:gl1 .5s steps(2,end) .05s 2}
 .denied .glitch::after{color:#2de2ff;animation:gl2 .5s steps(2,end) .05s 2}
 
-@keyframes bootAway{to{opacity:0;visibility:hidden;transform:scale(1.06)}}
 @keyframes lineIn{to{opacity:1;transform:none}}
-@keyframes bar{to{transform:scaleX(1)}}
-@keyframes ringIn{from{transform:rotate(-200deg) scale(.5);opacity:0}to{transform:none;opacity:1}}
-@keyframes crossIn{from{transform:scale(0) rotate(-45deg);opacity:0}to{transform:none;opacity:1}}
-@keyframes glow{0%,100%{transform:scale(.9);opacity:.6}50%{transform:scale(1.1);opacity:1}}
 @keyframes ping{from{transform:scale(1);opacity:.7}to{transform:scale(2.8);opacity:0}}
 @keyframes rot{to{transform:rotate(360deg)}}
 @keyframes blink{to{visibility:hidden}}
@@ -289,9 +240,6 @@ dialog.in .sheet{transform:none}
 @keyframes spark{0%{transform:translateY(0) scale(.6);opacity:0}10%{opacity:.9}80%{opacity:.5}100%{transform:translateY(-105vh) scale(1);opacity:0}}
 @keyframes shine{0%{transform:translateX(-120%) skewX(-18deg)}45%,100%{transform:translateX(320%) skewX(-18deg)}}
 @keyframes rip{to{transform:scale(28);opacity:0}}
-@keyframes rise{from{opacity:0;transform:translateY(18px)}}
-@keyframes lift{from{transform:translateY(14px)}}
-@keyframes riseX{from{opacity:0;transform:translateX(-14px)}}
 @keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(1.55);opacity:0}}
 @keyframes shake{0%,100%{transform:none}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
 @keyframes gl1{0%{opacity:.85;transform:translate(-3px,1px);clip-path:inset(10% 0 55% 0)}50%{opacity:.85;transform:translate(3px,-1px);clip-path:inset(60% 0 8% 0)}100%{opacity:0}}
@@ -302,8 +250,7 @@ dialog.in .sheet{transform:none}
   .stats dd{font-size:11.5px}
 }
 @media (prefers-reduced-motion:reduce){
-  .boot,.bg i{display:none}
-  .js body:not(.shown) .card,.js body:not(.shown) .item,.js body:not(.shown) .term-box{opacity:1}
+  .bg i{display:none}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important}
 }
 
