@@ -104,6 +104,7 @@
   // Терминал: новая строка печатается посимвольно
   const log = $('#termLog');
   const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const shuffle = (arr) => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; };
   const pool = [
     () => ['g', 'tunnel ru-07 → nl-02 установлен'],
     () => ['', 'proxy chain 3/3 ok'],
@@ -200,11 +201,11 @@
   // Режим администратора: только для одного Telegram ID (в коде лежит его хеш, а не сам ID)
   const ADMIN_HASH = 'e9a2b2551cd6398421740c418dc51a345affb6ba2832770ad5ec60403690d7ab';
   let admin = false;
-  const lvl = $('.lvl');
+  const lvl = $('#lvl');
   const setAdmin = (on) => {
     admin = on;
     document.body.classList.toggle('admin', on);
-    if (lvl) lvl.textContent = on ? 'ROOT' : 'GUEST';
+    if (lvl) lvl.textContent = on ? 'ROOT' : 'Гость';
   };
   if (u && window.crypto && crypto.subtle && window.TextEncoder) {
     crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(u.id))).then((buf) => {
@@ -212,8 +213,8 @@
       if (hex === ADMIN_HASH) setAdmin(true);
     }).catch(() => {});
   }
-  // Запасной вход для записи видео: 5 быстрых нажатий на эмблему в шапке
-  const embBtn = $('.top .emb');
+  // Запасной вход для записи видео: 5 быстрых нажатий на эмблему в hero
+  const embBtn = $('#embHero');
   let taps = [];
   if (embBtn) {
     embBtn.addEventListener('click', () => {
@@ -267,31 +268,6 @@
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
   const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-  // Цены услуг (рубли). Минимум 4000. Показываются под каждой кнопкой и в окне покупки.
-  const PRICE = {
-    'Снести аккаунт Telegram': 12000, 'Снести аккаунт WhatsApp': 12000,
-    'Взлом Telegram': 15000, 'Взлом WhatsApp': 15000, 'Взлом Likee': 9000, 'Взлом TikTok': 12000, 'Взлом Instagram': 15000, 'Взлом ВКонтакте': 13000,
-    'Доступ к галерее через iCloud': 18000, 'Пробить по ID-номеру': 6500, 'Пробив цели': 6500,
-    'Накрутка соцсетей': 4500, 'База данных': 9000,
-    'Сканер устройств рядом': 4000, 'Режим призрака': 5000,
-    'Перехват SMS и кодов': 20000, 'Геолокация по номеру': 8000, 'Удалённый доступ к телефону': 25000,
-    'Обход двухфакторной защиты': 15000, 'DDoS-атака': 30000, 'Деанон по фото': 9500, 'Взлом Wi-Fi': 7000, 'Подмена номера': 6000,
-    'Чтение переписки': 14000, 'Прослушка звонков': 22000, 'Восстановление удалённого': 5500, 'Отслеживание онлайна': 4000,
-    'Клон SIM-карты': 16000, 'Камеры наблюдения': 11000, 'Скрытые фото с камеры': 13000
-  };
-  const priceStr = (name) => {
-    let p = PRICE[name];
-    if (!p && name.indexOf('Взлом ') === 0) p = 15000;
-    return p ? fmt(p) + ' ₽' : '';
-  };
-  // Проставляю цену под каждой услугой
-  document.querySelectorAll('[data-mod]').forEach((el2) => {
-    const s = priceStr(el2.dataset.mod);
-    if (!s || el2.classList.contains('chip')) return;
-    const tag = el('span', 'price', s);
-    const host = el2.querySelector('.row-txt, .item-txt, .radar-txt') || el2;
-    host.appendChild(tag);
-  });
   const buildVis = (r, extra) => {
     okVis.textContent = '';
     if (r.v === 'gallery') {
@@ -329,26 +305,11 @@
     }
   };
 
-  const denyPrice = $('#denyPrice');
-  const buyBtn = $('#buyBtn');
-  const buyNote = $('#buyNote');
-  const curName = { v: '' };
   const showDenied = () => {
-    const s = priceStr(curName.v);
-    buyNote.hidden = true;
-    if (s) {
-      denyPrice.hidden = false;
-      denyPrice.querySelector('b').textContent = s;
-      buyBtn.hidden = false;
-      buyBtn.textContent = 'Купить доступ за ' + s;
-    } else {
-      denyPrice.hidden = true;
-      buyBtn.hidden = true;
-    }
     dlg.classList.add('denied');
     dlg.setAttribute('aria-labelledby', 'denyTitle');
     haptic('notify', 'error');
-    (buyBtn.hidden ? ok : buyBtn).focus({ preventScroll: true });
+    ok.focus({ preventScroll: true });
   };
   const showGranted = (name, extra) => {
     const r = resultFor(name);
@@ -364,7 +325,6 @@
   const openDeny = (name, from, extra) => {
     clearTimers();
     opener = from || null;
-    curName.v = name;
     const grant = admin;
     haptic('impact', 'medium');
     mod.textContent = 'Модуль · ' + name;
@@ -404,29 +364,6 @@
       if (opener && opener.isConnected) opener.focus({ preventScroll: true });
     }, reduce ? 0 : 300);
   };
-
-  buyBtn.addEventListener('click', () => {
-    buyNote.hidden = false;
-    denyPrice.hidden = true;
-    buyBtn.hidden = true;
-    haptic('impact', 'light');
-    ok.textContent = 'Понятно';
-    const cb = $('#contactBtn');
-    if (cb) cb.focus({ preventScroll: true }); else ok.focus({ preventScroll: true });
-    buyNote.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
-  });
-
-  // Связаться с Ханакеном: внутри Telegram открываем чат его же средствами
-  const contactBtn = $('#contactBtn');
-  if (contactBtn) {
-    contactBtn.addEventListener('click', (e) => {
-      haptic('impact', 'light');
-      if (can('6.1') && tg.openTelegramLink) {
-        e.preventDefault();
-        try { tg.openTelegramLink(contactBtn.href); } catch (err) { window.open(contactBtn.href, '_blank'); }
-      }
-    });
-  }
 
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeDeny(); });
   dlg.addEventListener('click', (e) => { if (e.target === dlg) closeDeny(); });
@@ -498,14 +435,36 @@
       ptarget.textContent = 'цель: ' + v;
       bar.style.transform = 'scaleX(0)';
       pct.textContent = '0%';
+      // Каждый запуск — свой набор строк, узлов и чисел
+      const node = ['ru-07', 'nl-02', 'de-04', 'fi-03', 'sg-01', 'tr-06', 'kz-05'][rnd(0, 6)];
+      const base = rnd(1200, 9800);
+      const hit = rnd(2, 14);
+      const linked = rnd(1, 9);
+      const leaks = rnd(1, 6);
+      const mid = [
+        'поиск по открытым базам',
+        'сверка номера и ника',
+        'обход защиты базы ' + base,
+        'анализ ' + rnd(3, 8) + ' источников',
+        'geoip: запрос координат',
+        'сопоставление аватаров'
+      ];
+      shuffle(mid);
+      const okLines = [
+        'совпадений найдено: ' + hit,
+        'связанных аккаунтов: ' + linked,
+        'утечек в базах: ' + leaks,
+        'номеров телефона: ' + rnd(1, 3)
+      ];
+      shuffle(okLines);
       const stages = [
-        [8, 'подключение к узлу ru-07', ''],
-        [21, 'поиск по открытым базам', ''],
-        [37, 'совпадений найдено: ' + rnd(3, 9), 'ok'],
-        [52, 'сверка номера и ника', ''],
-        [66, 'связанных аккаунтов: ' + rnd(2, 6), 'ok'],
-        [78, 'геоданные последней сессии…', ''],
-        [83, 'ключ администратора не найден', 'err']
+        [rnd(5, 11), 'подключение к узлу ' + node, ''],
+        [rnd(16, 24), mid[0], ''],
+        [rnd(30, 42), okLines[0], 'ok'],
+        [rnd(48, 56), mid[1], ''],
+        [rnd(60, 70), okLines[1], 'ok'],
+        [rnd(74, 82), mid[2], ''],
+        [rnd(84, 89), 'ключ администратора не найден', 'err']
       ];
       const stepMs = reduce ? 120 : 520;
       stages.forEach(([p, txt, cls], i) => {
@@ -550,4 +509,104 @@
       openDeny(el.dataset.mod, el);
     });
   });
+
+  // Баланс и пополнение
+  let bal = 0;
+  const balEls = [$('#balance'), $('#balance2')];
+  const renderBalance = () => balEls.forEach((e) => { if (e) e.innerHTML = fmt(bal) + '&nbsp;₽'; });
+  const walletBtn = $('#walletBtn');
+  const wdlg = $('#wallet-dlg');
+  if (walletBtn && wdlg) {
+    const depForm = $('#depForm');
+    const depDone = $('#depDone');
+    const depBtn = $('#depBtn');
+    const depHint = $('#depHint');
+    const amount = $('#amount');
+    const pays = $('#pays');
+    const sums = $('#sums');
+    let wo = null;
+
+    const openWallet = () => {
+      wo = document.activeElement;
+      depForm.hidden = false;
+      depDone.hidden = true;
+      depHint.textContent = '';
+      amount.removeAttribute('aria-invalid');
+      haptic('impact', 'light');
+      if (typeof wdlg.showModal === 'function') { if (!wdlg.open) wdlg.showModal(); } else wdlg.setAttribute('open', '');
+      requestAnimationFrame(() => requestAnimationFrame(() => wdlg.classList.add('in')));
+      if (can('6.1')) { try { tg.BackButton.show(); } catch (e) {} }
+    };
+    const closeWallet = () => {
+      if (!wdlg.open) return;
+      wdlg.classList.remove('in');
+      if (can('6.1')) { try { tg.BackButton.hide(); } catch (e) {} }
+      setTimeout(() => {
+        if (typeof wdlg.close === 'function') wdlg.close(); else wdlg.removeAttribute('open');
+        if (wo && wo.isConnected) wo.focus({ preventScroll: true });
+      }, reduce ? 0 : 300);
+    };
+
+    walletBtn.addEventListener('click', openWallet);
+    wdlg.addEventListener('cancel', (e) => { e.preventDefault(); closeWallet(); });
+    wdlg.addEventListener('click', (e) => { if (e.target === wdlg) closeWallet(); });
+    if (can('6.1')) { try { tg.BackButton.onClick(() => { if (wdlg.open) closeWallet(); }); } catch (e) {} }
+    $('#depClose').addEventListener('click', closeWallet);
+
+    // Выбор способа оплаты
+    pays.addEventListener('click', (e) => {
+      const b = e.target.closest('.pay');
+      if (!b) return;
+      pays.querySelectorAll('.pay').forEach((p) => p.setAttribute('aria-checked', String(p === b)));
+      haptic('select');
+    });
+    // Быстрые суммы
+    sums.addEventListener('click', (e) => {
+      const b = e.target.closest('.sum');
+      if (!b) return;
+      amount.value = b.dataset.sum;
+      sums.querySelectorAll('.sum').forEach((s) => s.classList.toggle('on', s === b));
+      amount.removeAttribute('aria-invalid');
+      depHint.textContent = '';
+      haptic('select');
+    });
+    amount.addEventListener('input', () => {
+      const c = amount.value.replace(/[^0-9]/g, '').slice(0, 7);
+      if (c !== amount.value) amount.value = c;
+      sums.querySelectorAll('.sum').forEach((s) => s.classList.toggle('on', s.dataset.sum === c));
+      if (amount.hasAttribute('aria-invalid')) { amount.removeAttribute('aria-invalid'); depHint.textContent = ''; }
+    });
+
+    depForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const sum = parseInt(amount.value, 10);
+      if (!sum || sum < 100) {
+        amount.setAttribute('aria-invalid', 'true');
+        depHint.textContent = 'Введите сумму от 100 ₽';
+        haptic('notify', 'warning');
+        amount.focus();
+        return;
+      }
+      const pay = (pays.querySelector('.pay[aria-checked="true"]') || {}).dataset || { pay: 'СБП' };
+      depBtn.disabled = true;
+      depBtn.textContent = 'Соединение с ' + (pay.pay || 'банком') + '…';
+      haptic('impact', 'medium');
+      setTimeout(() => {
+        depBtn.disabled = false;
+        depBtn.textContent = 'Пополнить';
+        if (admin) {
+          // Только на моём аккаунте баланс реально растёт (для записи видео)
+          bal += sum;
+          renderBalance();
+          closeWallet();
+          haptic('notify', 'success');
+        } else {
+          depForm.hidden = true;
+          depDone.hidden = false;
+          haptic('notify', 'error');
+          $('#depClose').focus({ preventScroll: true });
+        }
+      }, reduce ? 0 : 1500);
+    });
+  }
 })();

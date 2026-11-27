@@ -515,3 +515,110 @@ dialog.in .sheet{transform:none}
 .btn-contact svg{width:19px;height:19px;stroke-width:2}
 .btn-contact:active{--s:.97}
 @media (hover:hover){.btn-contact:hover{filter:brightness(1.07)}}
+
+/* ==================== V5: редизайн, баланс ==================== */
+@font-face{font-family:"Unbounded";font-style:normal;font-weight:500 800;font-display:swap;src:url(fonts/unb-cyr.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Unbounded";font-style:normal;font-weight:500 800;font-display:swap;src:url(fonts/unb-lat.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{--disp:"Unbounded",var(--sans)}
+
+/* старое, что больше не используется */
+.wm,.sub,.eyebrow,.stats,.brand,.emb-sm,.price{display:none!important}
+
+/* фон: только чёрный и эмблема */
+body{background:#000}
+.bg{background:#000}
+.bg .bg-emb{opacity:.055}
+
+/* шапка */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 2px 18px}
+.wallet{display:flex;align-items:center;gap:10px;padding:7px 8px 7px 9px;border:1px solid var(--line-2);border-radius:14px;cursor:pointer;
+  background:linear-gradient(180deg,#141210,#0b0a09);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  transform:scale(var(--s,1));transition:transform .16s var(--ease),border-color .2s}
+.wallet:active{--s:.96}
+.wallet-ic{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;color:var(--gold);background:rgba(226,187,108,.1);border:1px solid rgba(226,187,108,.26)}
+.wallet-ic svg{width:17px;height:17px}
+.wallet-txt{display:flex;flex-direction:column;line-height:1.05;text-align:left}
+.wallet-lbl{font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.wallet-txt b{font:800 14px/1.2 var(--disp);color:var(--text);font-variant-numeric:tabular-nums;margin-top:3px}
+.wallet-plus{display:grid;place-items:center;width:24px;height:24px;border-radius:8px;color:#1a1408;background:var(--gold-grad);margin-left:2px}
+.wallet-plus svg{width:15px;height:15px;stroke-width:2.6}
+@media (hover:hover){.wallet:hover{border-color:rgba(226,187,108,.45)}}
+
+.link{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:#09090b;border:1px solid #241f16}
+.link b{font:800 11px/1 var(--disp);letter-spacing:.14em;color:var(--gold)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:30px 18px 18px;border-radius:26px;border:1px solid transparent;text-align:center;
+  background:linear-gradient(180deg,#121110,#060605 70%) padding-box,
+             linear-gradient(160deg,rgba(226,187,108,.5),#1c1a16 42%,rgba(156,117,51,.4)) border-box;
+  box-shadow:0 30px 60px -36px rgba(226,187,108,.35)}
+.hero::before,.hero::after{content:"";position:absolute;left:50%;width:150%;height:150%;transform:translateX(-50%);pointer-events:none}
+.emb-hero{display:block;width:92px;height:92px;margin:0 auto 14px;cursor:pointer;filter:drop-shadow(0 0 22px rgba(226,187,108,.3))}
+.emb-hero .emb-ring{animation-duration:80s}
+.wordmark{margin:0;font:800 clamp(30px,9vw,42px)/1 var(--disp);letter-spacing:.06em;
+  background:linear-gradient(180deg,#fbeec4 0%,#e3bb68 55%,#9c7533 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px auto 20px;max-width:280px}
+.tag::before,.tag::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(226,187,108,.55))}
+.tag::after{background:linear-gradient(90deg,rgba(226,187,108,.55),transparent)}
+.tag span{font:600 11px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+.me{position:relative;display:flex;align-items:center;gap:12px;padding:11px;border-radius:16px;border:1px solid var(--line-2);background:#050505;text-align:left}
+.me-txt{min-width:0;display:flex;flex-direction:column}
+.me-txt b{font:700 14.5px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me-txt span{font:500 12px/1.5 var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvl{margin-left:auto;flex:none;padding:6px 11px;border-radius:9px;font:700 11px/1 var(--disp);letter-spacing:.06em;
+  color:var(--gold);background:rgba(226,187,108,.08);border:1px solid rgba(226,187,108,.4)}
+.admin .lvl{color:#07100b;background:var(--gold-grad);border-color:transparent}
+
+/* заголовки разделов брендовым шрифтом */
+.sec{font-family:var(--disp);font-weight:700;letter-spacing:.14em}
+
+/* окно пополнения */
+#wallet-dlg .sheet{padding:26px 18px 16px}
+.wrap{position:relative}
+.wal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px;text-align:left}
+.wal-code{font:600 11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.wal-top .t{margin:4px 0 0;font:800 21px/1.1 var(--disp)}
+.wal-balance{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none}
+.wal-balance span{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.wal-balance b{font:800 18px/1 var(--disp);color:var(--text);font-variant-numeric:tabular-nums}
+.wal-label{text-align:left;margin:16px 0 9px;font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pays{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pay{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 6px;border-radius:14px;cursor:pointer;
+  border:1px solid var(--line-2);background:#0b0b0d;transition:border-color .2s,background-color .2s,transform .16s var(--ease)}
+.pay:active{transform:scale(.96)}
+.pay[aria-checked="true"]{border-color:var(--gold);background:rgba(226,187,108,.08);box-shadow:inset 0 0 0 1px rgba(226,187,108,.3)}
+.pay-m{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;font:800 15px/1 var(--disp);color:#fff}
+.pay-m svg{width:20px;height:20px;fill:#fff;stroke:none}
+.pay-sbp{background:linear-gradient(135deg,#6a2fb5,#e5195b);font-size:10px;letter-spacing:.02em}
+.pay-sber{background:linear-gradient(135deg,#1aaf4b,#0a7a30)}
+.pay-tbank{background:linear-gradient(135deg,#ffdd2d,#f5c400);color:#111}
+.pay-alfa{background:linear-gradient(135deg,#ef3124,#a5160d)}
+.pay-crypto{background:linear-gradient(135deg,#26a17b,#13795a)}
+.pay-stars{background:linear-gradient(135deg,#4aa6f5,#2b78d4)}
+.pay-n{font:600 11.5px/1 var(--sans);color:var(--muted)}
+.pay[aria-checked="true"] .pay-n{color:var(--text)}
+.sums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sum{padding:12px 4px;border-radius:12px;border:1px solid var(--line-2);background:#0b0b0d;cursor:pointer;
+  font:700 13px/1 var(--disp);color:var(--text);font-variant-numeric:tabular-nums;transition:border-color .2s,background-color .2s,transform .16s var(--ease)}
+.sum:active{transform:scale(.95)}
+.sum.on{border-color:var(--gold);background:rgba(226,187,108,.1);color:var(--gold)}
+.amount-row{position:relative;margin-top:9px}
+.amount-row input{width:100%;height:52px;padding:0 34px 0 14px;border-radius:14px;border:1px solid var(--line-2);background:#000;color:var(--text);
+  font:700 17px/1 var(--disp);outline:none;font-variant-numeric:tabular-nums;transition:border-color .2s,box-shadow .2s}
+.amount-row input::placeholder{font-family:var(--sans);font-weight:500;color:#6f747d}
+.amount-row input:focus{border-color:rgba(226,187,108,.7);box-shadow:0 0 0 3px rgba(226,187,108,.15)}
+.amount-row input[aria-invalid="true"]{border-color:var(--deny)}
+.amount-cur{position:absolute;right:14px;top:50%;transform:translateY(-50%);font:700 16px/1 var(--disp);color:var(--faint)}
+.dep-hint{min-height:1em;margin:8px 2px 0;text-align:left;font:500 13px/1.3 var(--sans);color:#ff8d99}
+.dep-hint:empty{min-height:0}
+.btn-pay{margin-top:14px}
+.wal-safe{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;font:500 11.5px/1.3 var(--mono);color:var(--faint)}
+.wal-safe svg{width:13px;height:13px;color:var(--ok)}
+.dep-done{text-align:center;padding:6px 0 4px}
+.dep-ico{width:70px;height:70px;margin:4px auto 14px;display:grid;place-items:center;border-radius:50%;color:#ff6b78;
+  background:radial-gradient(circle,rgba(255,74,92,.18),#120a0b 72%);border:1px solid rgba(255,74,92,.4)}
+.dep-ico svg{width:28px;height:28px}
+.dep-done .t{margin:4px 0 8px;font:800 22px/1.1 var(--disp)}
+#wallet-dlg.in .sheet{transform:none}
+
+@media (max-width:360px){.pay-n{font-size:10.5px}.sum{font-size:12px}}

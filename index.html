@@ -13,6 +13,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/manrope-cyr.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/manrope-lat.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/unb-lat.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
 <script src="app.js" defer></script>
@@ -51,55 +52,95 @@
   <symbol id="i-cam" viewBox="0 0 24 24"><path d="M16.75 12h3.63a1 1 0 0 1 .9 1.45l-2.04 4.07a1 1 0 0 1-1.7.13l-2.13-2.97"/><path d="M17.1 9.05a1 1 0 0 1 .45 1.34l-3.1 6.21a1 1 0 0 1-1.35.45L3.6 12.3a2.92 2.92 0 0 1-1.3-3.91L3.7 5.6a2.92 2.92 0 0 1 3.9-1.3z"/><path d="M2 19h3.76a2 2 0 0 0 1.8-1.1L9 15M2 21v-4M7 9h.01"/></symbol>
   <symbol id="i-ok" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.5 4.5 21 3l-1.5 6.5L21 3 3.2 10.8a.6.6 0 0 0 .05 1.12l4.2 1.5 1.5 4.2a.6.6 0 0 0 1.1.07L13.5 13"/><path d="m21 3-10.5 10"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M11.5 3.2a.5.5 0 0 1 .9 0l2.3 5 5.4.6a.5.5 0 0 1 .3.9l-4 3.7 1.1 5.3a.5.5 0 0 1-.74.54L12 16.9l-4.76 2.64a.5.5 0 0 1-.74-.54l1.1-5.3-4-3.7a.5.5 0 0 1 .3-.9l5.4-.6z"/></symbol>
 </svg>
 
 <div class="bg" aria-hidden="true"><span class="emb bg-emb"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span></div>
-<div class="wm" aria-hidden="true"></div>
-
 <div class="boot" id="boot" aria-hidden="true">
   <div class="boot-in">
     <span class="emb emb-xl"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span>
     <div class="boot-logo" id="bootLogo">XANAKEN</div>
-    <div class="boot-log">
-      <div>› xanaken://init</div>
-      <div>› узел ru-07 <span class="ok">ok</span></div>
-      <div>› канал AES-256 <span class="ok">ok</span></div>
-      <div>› сессия зашифрована</div>
-      <div>› добро пожаловать</div>
-    </div>
-    <div class="boot-bar"><span></span></div>
   </div>
 </div>
 
-<div class="app">
-  <header class="top">
-    <div class="brand">
-      <span class="emb emb-sm" aria-hidden="true"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span>
-      <div>
-        <p class="wordmark" id="wordmark">XANAKEN</p>
-        <p class="sub">private panel</p>
+<dialog id="wallet-dlg" aria-labelledby="walletTitle">
+  <div class="sheet">
+    <div class="sheet-wm" aria-hidden="true">
+      <span class="emb sheet-emb"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span>
+    </div>
+    <div class="wrap">
+      <div class="wal-top">
+        <div>
+          <p class="wal-code">BALANCE</p>
+          <h2 class="t" id="walletTitle">Пополнить баланс</h2>
+        </div>
+        <p class="wal-balance"><span>Сейчас</span><b id="balance2">0&nbsp;₽</b></p>
+      </div>
+
+      <form id="depForm" novalidate autocomplete="off">
+        <p class="wal-label">Способ оплаты</p>
+        <div class="pays" id="pays" role="radiogroup" aria-label="Способ оплаты">
+          <button class="pay" type="button" role="radio" aria-checked="true" data-pay="СБП" data-badge="СБП"><span class="pay-m pay-sbp">СБП</span><span class="pay-n">СБП</span></button>
+          <button class="pay" type="button" role="radio" aria-checked="false" data-pay="Сбербанк" data-badge="СБЕР"><span class="pay-m pay-sber">С</span><span class="pay-n">Сбербанк</span></button>
+          <button class="pay" type="button" role="radio" aria-checked="false" data-pay="Т-Банк" data-badge="Т"><span class="pay-m pay-tbank">Т</span><span class="pay-n">Т-Банк</span></button>
+          <button class="pay" type="button" role="radio" aria-checked="false" data-pay="Альфа-Банк" data-badge="А"><span class="pay-m pay-alfa">А</span><span class="pay-n">Альфа</span></button>
+          <button class="pay" type="button" role="radio" aria-checked="false" data-pay="Криптовалюта" data-badge="USDT"><span class="pay-m pay-crypto">₮</span><span class="pay-n">Крипта</span></button>
+          <button class="pay" type="button" role="radio" aria-checked="false" data-pay="Telegram Stars" data-badge="★"><span class="pay-m pay-stars"><svg aria-hidden="true"><use href="#i-star"/></svg></span><span class="pay-n">Stars</span></button>
+        </div>
+
+        <p class="wal-label">Сумма</p>
+        <div class="sums" id="sums">
+          <button class="sum" type="button" data-sum="500">500&nbsp;₽</button>
+          <button class="sum" type="button" data-sum="1000">1 000&nbsp;₽</button>
+          <button class="sum" type="button" data-sum="2500">2 500&nbsp;₽</button>
+          <button class="sum" type="button" data-sum="5000">5 000&nbsp;₽</button>
+        </div>
+        <label class="sr" for="amount">Своя сумма в рублях</label>
+        <div class="amount-row">
+          <input id="amount" name="amount" type="text" inputmode="numeric" placeholder="Своя сумма" maxlength="7" autocomplete="off" aria-describedby="depHint">
+          <span class="amount-cur">₽</span>
+        </div>
+        <p class="dep-hint" id="depHint" aria-live="polite"></p>
+        <button class="btn btn-pay" type="submit" id="depBtn">Пополнить</button>
+        <p class="wal-safe"><svg aria-hidden="true"><use href="#i-lock"/></svg>Платёж защищён · данные не сохраняются</p>
+      </form>
+
+      <div class="dep-done" id="depDone" hidden>
+        <div class="dep-ico" aria-hidden="true"><svg><use href="#i-lock"/></svg></div>
+        <p class="wal-code">ERROR · PAYMENT UNAVAILABLE</p>
+        <h2 class="t">Временно недоступно</h2>
+        <p class="msg">Пополнение баланса сейчас недоступно. Попробуйте позже.</p>
+        <button class="btn" type="button" id="depClose">Понятно</button>
       </div>
     </div>
+  </div>
+</dialog>
+
+<div class="app">
+  <header class="top">
+    <button class="wallet" type="button" id="walletBtn" aria-label="Баланс, пополнить">
+      <span class="wallet-ic"><svg><use href="#i-wallet"/></svg></span>
+      <span class="wallet-txt"><span class="wallet-lbl">Баланс</span><b id="balance">0&nbsp;₽</b></span>
+      <span class="wallet-plus" aria-hidden="true"><svg><use href="#i-plus"/></svg></span>
+    </button>
     <div class="link" role="status" aria-label="Соединение защищено">
       <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="link-txt"><b>SECURE</b><span id="linkNode">ru-07 · 24&nbsp;мс</span></span>
+      <b>SECURE</b>
     </div>
   </header>
 
   <main>
     <section class="hero" aria-labelledby="h1">
-      <p class="eyebrow"><svg><use href="#i-shield"/></svg>Сессия зашифрована</p>
-      <h1 id="h1">Панель управления</h1>
+      <span class="emb emb-hero" id="embHero" aria-hidden="true"><img class="emb-ring" src="img/emb-ring.svg" alt="" width="1600" height="1600"><img class="emb-cross" src="img/emb-cross.svg" alt="" width="1600" height="1600"></span>
+      <h1 class="wordmark" id="h1">XANAKEN</h1>
+      <p class="tag"><span>Закрытая панель</span></p>
       <div class="me">
         <span class="ava" id="ava" aria-hidden="true">X</span>
         <p class="me-txt"><b id="meName">Гость</b><span id="meId">ID скрыт</span></p>
-        <span class="lvl">GUEST</span>
+        <span class="lvl" id="lvl">Гость</span>
       </div>
-      <dl class="stats">
-        <div><dt>Узлы</dt><dd>12 online</dd></div>
-        <div><dt>Пинг</dt><dd id="ping">24&nbsp;мс</dd></div>
-        <div><dt>Канал</dt><dd>AES-256</dd></div>
-      </dl>
     </section>
 
     <section class="probe" aria-labelledby="h-probe">
@@ -333,15 +374,7 @@
         <p class="code">ERROR 403 · ACCESS DENIED</p>
         <h2 class="t glitch" id="denyTitle" data-text="Доступ закрыт">Доступ закрыт</h2>
         <p class="msg" id="denyMsg">Доступ пока имеет только администратор <b>Типл</b></p>
-        <p class="price-line" id="denyPrice" hidden>Стоимость модуля <b></b></p>
-        <div class="buy" id="buyNote" hidden>
-          <p class="buy-txt">Свяжитесь с <b>Ханакеном</b>, чтобы купить доступ</p>
-          <a class="btn btn-contact" id="contactBtn" href="https://t.me/xborzx13" target="_blank" rel="noopener">
-            <svg aria-hidden="true"><use href="#i-send"/></svg>Написать Ханакену
-          </a>
-        </div>
-        <button class="btn btn-buy" type="button" id="buyBtn">Купить доступ</button>
-        <button class="btn btn-ghost" type="button" id="denyOk">Понятно</button>
+        <button class="btn" type="button" id="denyOk">Понятно</button>
       </div>
       <div class="phase phase-grant">
         <p class="code" id="okCode">ACCESS GRANTED · ROOT</p>
