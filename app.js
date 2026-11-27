@@ -126,18 +126,33 @@
   const ADMIN_HASH = 'e9a2b2551cd6398421740c418dc51a345affb6ba2832770ad5ec60403690d7ab';
   let admin = false;
   const studioButton = $('#studioBtn');
+  const studioAccess = $('#studioAccess');
+  const studioAccessState = $('#studioAccessState');
+  const studioRetry = $('#studioRetry');
   const studioDialog = $('#studioDialog');
   const studioConfig = $('meta[name="studio-config"]');
   let studio;
 
+  function studioAccessError(message, canRetry = true) {
+    studioAccessState.textContent = message;
+    studioRetry.hidden = !canRetry;
+  }
+
   async function authorizeStudio(user, initData) {
-    if (!user || !initData || !studioConfig || !crypto.subtle) return;
+    if (!user || studio || !studioConfig || !window.crypto?.subtle) return;
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(user.id)));
     const ownerHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
     if (ownerHash !== ADMIN_HASH) return;
 
+    studioAccess.hidden = false;
+    studioRetry.hidden = true;
+    if (!initData) {
+      studioAccessError('Telegram не передал данные входа. Открой Panel заново в чате с ботом.', false);
+      return;
+    }
+    studioAccessState.textContent = 'Подключаем студию…';
     const abort = new AbortController();
-    const timeout = setTimeout(() => abort.abort(), 5000);
+    const timeout = setTimeout(() => abort.abort(), 10000);
     try {
       const response = await fetch(studioConfig.content, {
         method: 'POST',
@@ -148,9 +163,13 @@
         redirect: 'error',
         signal: abort.signal
       });
-      if (!response.ok) return;
+      if (response.status === 403) {
+        studioAccessError('Telegram не подтвердил этот сеанс. Закрой окно и открой Panel заново.', false);
+        return;
+      }
+      if (!response.ok) throw new Error('Studio request failed');
       const { scenes } = await response.json();
-      if (!Array.isArray(scenes) || scenes.length !== 4) return;
+      if (!Array.isArray(scenes) || scenes.length !== 4) throw new Error('Invalid studio data');
       const { mountStudio } = await import(studioConfig.dataset.module);
       studio = mountStudio({
         button: studioButton,
@@ -165,10 +184,18 @@
       document.body.classList.add('admin');
       $('#lvl').textContent = 'ROOT';
       studioButton.hidden = false;
+      studioAccess.hidden = true;
+    } catch {
+      studioAccessError('Связь со студией прервалась.');
     } finally {
       clearTimeout(timeout);
     }
   }
+
+  studioRetry.addEventListener('click', () => {
+    studioRetry.hidden = true;
+    authorizeStudio(tg?.initDataUnsafe?.user, tg?.initData).catch(() => studioAccessError('Связь со студией прервалась.'));
+  });
 
   // Что показывает каждый модуль администратору
   const L = (a) => ({ v: 'log', l: a });

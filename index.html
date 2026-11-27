@@ -15,9 +15,9 @@
 <link rel="preload" href="fonts/manrope-cyr.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/manrope-lat.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/unb-lat.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css?v=60c700bb">
+<link rel="stylesheet" href="style.css?v=9216d4cf">
 <script id="telegram-sdk" src="https://telegram.org/js/telegram-web-app.js" async></script>
-<script src="app.js?v=867a1d7f" defer></script>
+<script src="app.js?v=96acb6ce" defer></script>
 </head>
 <body>
 <svg class="sprite" aria-hidden="true" focusable="false">
@@ -132,6 +132,10 @@
       </div>
     </section>
 
+    <section class="studio-access" id="studioAccess" aria-label="Доступ к студии" hidden>
+      <p id="studioAccessState" role="status"></p>
+      <button class="studio-access-retry" id="studioRetry" type="button" hidden>Повторить</button>
+    </section>
     <button class="studio-entry" id="studioBtn" type="button" hidden>
       <span>Xanaken Studio</span><small>Режим записи ›</small>
     </button>

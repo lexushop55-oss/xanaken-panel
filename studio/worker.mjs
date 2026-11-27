@@ -6,20 +6,33 @@ const fromHex = (value) => Uint8Array.from(value.match(/.{2}/g), (byte) => parse
 const toHex = (value) => Array.from(new Uint8Array(value), (byte) => byte.toString(16).padStart(2, '0')).join('');
 const maxBodyBytes = 8192;
 
-async function isOwner(raw, env, verifyKey, timestamp) {
-  const params = new URLSearchParams(raw);
-  if (new Set(params.keys()).size !== params.size) return false;
+const telegramFields = (params) => Array.from(params, ([key, value]) => key + '=' + value).join('\n');
+const hmacAlgorithm = { name: 'HMAC', hash: 'SHA-256' };
+
+async function verifyLaunch(params, env, publicKey) {
+  const hash = params.get('hash');
   const signature = params.get('signature');
-  const authDate = Number(params.get('auth_date'));
-  if (!signature || !/^[A-Za-z0-9_-]{86}={0,2}$/.test(signature)) return false;
-  if (!Number.isSafeInteger(authDate) || authDate < timestamp - 300 || authDate > timestamp + 30) return false;
-  params.delete('signature');
   params.delete('hash');
   params.sort();
-  const fields = Array.from(params, ([key, value]) => key + '=' + value).join('\n');
-  const message = env.BOT_ID + ':WebAppData\n' + fields;
+
+  if (/^[a-f0-9]{64}$/i.test(env.TELEGRAM_INIT_DATA_KEY || '') && /^[a-f0-9]{64}$/i.test(hash || '')) {
+    const key = await crypto.subtle.importKey('raw', fromHex(env.TELEGRAM_INIT_DATA_KEY), hmacAlgorithm, false, ['verify']);
+    if (await crypto.subtle.verify(hmacAlgorithm, key, fromHex(hash), encoder.encode(telegramFields(params)))) return true;
+  }
+
+  if (!signature || !/^[A-Za-z0-9_-]{86}={0,2}$/.test(signature)) return false;
+  params.delete('signature');
+  const message = env.BOT_ID + ':WebAppData\n' + telegramFields(params);
   const bytes = Uint8Array.from(atob(signature.replace(/-/g, '+').replace(/_/g, '/')), (char) => char.charCodeAt(0));
-  if (!await crypto.subtle.verify('Ed25519', verifyKey, bytes, encoder.encode(message))) return false;
+  return crypto.subtle.verify('Ed25519', await publicKey, bytes, encoder.encode(message));
+}
+
+async function isOwner(raw, env, publicKey, timestamp) {
+  const params = new URLSearchParams(raw);
+  if (new Set(params.keys()).size !== params.size) return false;
+  const authDate = Number(params.get('auth_date'));
+  if (!Number.isSafeInteger(authDate) || authDate < timestamp - 300 || authDate > timestamp + 30) return false;
+  if (!await verifyLaunch(params, env, publicKey)) return false;
   const user = JSON.parse(params.get('user') || 'null');
   if (!user || !Number.isSafeInteger(user.id)) return false;
   const hashedId = await crypto.subtle.digest('SHA-256', encoder.encode(String(user.id)));
@@ -55,7 +68,7 @@ export function createStudioHandler(publicKey, nowSeconds = () => Math.floor(Dat
 
     try {
       const raw = await readBody(request);
-      if (raw && await isOwner(raw, env, await publicKey, nowSeconds())) return reply(200, { scenes });
+      if (raw && await isOwner(raw, env, publicKey, nowSeconds())) return reply(200, { scenes });
     } catch {
       // Invalid launch data must never grant studio access.
     }

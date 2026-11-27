@@ -61,3 +61,36 @@ test('does not return data to a different origin', async () => {
   assert.equal(response.status, 403);
   assert.equal(response.headers.get('Access-Control-Allow-Origin'), null);
 });
+
+const signingKey = Buffer.from('906e8c5ba35350d9d2202fa6e0db78eafcd440922d0782bd0bbebd99763b6bc4', 'hex');
+const legacyEnv = { ...env, TELEGRAM_INIT_DATA_KEY: signingKey.toString('hex') };
+
+async function hmacData({ id = owner, age = 0, signature } = {}) {
+  const form = new URLSearchParams({ auth_date: now - age, user: JSON.stringify({ id, first_name: 'Test' }) });
+  if (signature !== undefined) form.set('signature', signature);
+  form.sort();
+  const fields = Array.from(form, ([name, value]) => name + '=' + value).join('\n');
+  const key = await crypto.subtle.importKey('raw', signingKey, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const mac = await crypto.subtle.sign('HMAC', key, encoder.encode(fields));
+  form.set('hash', Buffer.from(mac).toString('hex'));
+  return form;
+}
+
+function sendHmac(form) {
+  return handler(new Request('https://studio.example/studio', {
+    method: 'POST', headers: { Origin: origin, 'Content-Type': 'text/plain' }, body: String(form)
+  }), legacyEnv);
+}
+
+test('accepts Telegram HMAC launches with or without an Ed25519 signature', async () => {
+  assert.equal((await sendHmac(await hmacData())).status, 200);
+  assert.equal((await sendHmac(await hmacData({ signature: 'other-format' }))).status, 200);
+});
+
+test('HMAC still rejects guests, expired sessions and modified signed fields', async () => {
+  assert.equal((await sendHmac(await hmacData({ id: owner + 1 }))).status, 403);
+  assert.equal((await sendHmac(await hmacData({ age: 301 }))).status, 403);
+  const tampered = await hmacData({ id: owner + 1 });
+  tampered.set('user', JSON.stringify({ id: owner }));
+  assert.equal((await sendHmac(tampered)).status, 403);
+});

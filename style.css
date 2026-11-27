@@ -782,3 +782,7 @@ body{background:#000}
   .studio-tools { margin-left: auto; }
   .studio-stage { min-height: 0; }
 }
+
+.studio-access{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 16px;padding:10px 12px;border:1px solid #6d5736;border-radius:12px;background:#16110c;color:#f8e3ae}
+.studio-access p{margin:0;font:600 13px/1.35 var(--sans)}
+.studio-access-retry{flex:none;min-height:44px;padding:6px 10px;border:1px solid #6d5736;border-radius:8px;background:#312518;color:#f8e3ae;font:700 12px/1 var(--sans);cursor:pointer}
