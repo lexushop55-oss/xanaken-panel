@@ -41,6 +41,9 @@
   const scramble = (el, ms) => {
     if (!el || reduce) return;
     const final = el.textContent;
+    // на время перебора держим высоту, чтобы случайные широкие буквы не двигали экран
+    el.style.height = el.offsetHeight + 'px';
+    el.style.overflow = 'hidden';
     const start = performance.now();
     const step = (now) => {
       const p = Math.min(1, (now - start) / ms);
@@ -50,7 +53,8 @@
         out += final[i] === ' ' ? ' ' : GLYPHS[(Math.random() * GLYPHS.length) | 0];
       }
       el.textContent = out;
-      if (p < 1) requestAnimationFrame(step); else el.textContent = final;
+      if (p < 1) requestAnimationFrame(step);
+      else { el.textContent = final; el.style.height = ''; el.style.overflow = ''; }
     };
     requestAnimationFrame(step);
   };
