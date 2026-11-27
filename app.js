@@ -603,6 +603,7 @@
       } catch (e) {}
     }
   };
+  $('.app').removeAttribute('inert');
   if (window.Telegram && window.Telegram.WebApp) initTelegram();
   else $('#telegram-sdk').addEventListener('load', initTelegram, { once: true });
 })();
