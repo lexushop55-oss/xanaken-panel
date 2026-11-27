@@ -51,7 +51,9 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
 /* загрузка */
 .boot{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);
   animation:bootAway .5s var(--ease) 1.9s forwards}
-.boot.out{animation:bootAway .3s var(--ease) forwards}
+/* со скриптом заставку убирает app.js, отсчёт с момента показа страницы в Telegram */
+.js .boot{animation:none}
+.js .boot.out,.boot.out{animation:bootAway .3s var(--ease) forwards}
 .boot-in{width:min(280px,80vw);text-align:center}
 .emb-xl{width:112px;height:112px;margin-bottom:18px}
 .emb-xl::before{content:"";position:absolute;inset:-30%;border-radius:50%;background:radial-gradient(circle,rgba(233,199,126,.35),transparent 65%);

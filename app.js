@@ -3,6 +3,22 @@
 
   document.documentElement.classList.add('js');
 
+  // Сразу говорим Telegram, что страница готова. Иначе он держит свою заглушку,
+  // пока не загрузится его SDK, и заставка проигрывается под ней невидимой
+  const tgPost = (type) => {
+    try {
+      if (window.TelegramWebviewProxy && window.TelegramWebviewProxy.postEvent) {
+        window.TelegramWebviewProxy.postEvent(type, JSON.stringify(''));
+      } else if (window.external && 'notify' in window.external) {
+        window.external.notify(JSON.stringify({ eventType: type, eventData: '' }));
+      } else if (window.parent !== window) {
+        window.parent.postMessage(JSON.stringify({ eventType: type, eventData: '' }), '*');
+      }
+    } catch (e) {}
+  };
+  tgPost('web_app_ready');
+  tgPost('web_app_expand');
+
   const $ = (s) => document.querySelector(s);
   let tg;
   const can = (v) => {
@@ -59,21 +75,18 @@
     show();
     setTimeout(() => boot.remove(), 320);
   };
-  // Время считаем от начала загрузки страницы: если страница грузилась долго,
-  // часть заставки уже прошла на CSS-анимации
+  // Заставка идёт с момента, когда Telegram показал страницу: анимации эмблемы
+  // запускаются заново, даже если браузер успел нарисовать их раньше под заглушкой
   const BOOT_MS = 1950;
-  const elapsed = performance.now();
-  if (boot) {
-    if (reduce || elapsed >= BOOT_MS + 500) { boot.remove(); show(); }
-    else {
-      if (elapsed < 600) scramble($('#bootLogo'), 900);
-      boot.addEventListener('click', hideBoot, { once: true });
-      boot.addEventListener('animationend', (e) => {
-        if (e.target === boot && e.animationName === 'bootAway') boot.remove();
-      });
-      setTimeout(show, Math.max(0, BOOT_MS - elapsed));
-    }
-  } else show();
+  if (boot && !reduce) {
+    try { boot.getAnimations({ subtree: true }).forEach((a) => { a.currentTime = 0; }); } catch (e) {}
+    scramble($('#bootLogo'), 900);
+    boot.addEventListener('click', hideBoot, { once: true });
+    setTimeout(hideBoot, BOOT_MS);
+  } else {
+    if (boot) boot.remove();
+    show();
+  }
 
   // Пинг
   const ping = $('#ping');
