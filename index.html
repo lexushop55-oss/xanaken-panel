@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://telegram.org; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://telegram.org; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src https://xanaken-studio.xanaken-miniapp.workers.dev; base-uri 'none'; form-action 'none'">
+<meta name="studio-config" content="https://xanaken-studio.xanaken-miniapp.workers.dev/studio" data-module="./studio-ui.js?v=5e4ee354">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="dark">
@@ -14,9 +15,9 @@
 <link rel="preload" href="fonts/manrope-cyr.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/manrope-lat.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/unb-lat.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css?v=952e3121">
+<link rel="stylesheet" href="style.css?v=60c700bb">
 <script id="telegram-sdk" src="https://telegram.org/js/telegram-web-app.js" async></script>
-<script src="app.js?v=f6c3f5ce" defer></script>
+<script src="app.js?v=bd99851b" defer></script>
 </head>
 <body>
 <svg class="sprite" aria-hidden="true" focusable="false">
@@ -130,6 +131,10 @@
         <span class="lvl" id="lvl">Гость</span>
       </div>
     </section>
+
+    <button class="studio-entry" id="studioBtn" type="button" hidden>
+      <span>Xanaken Studio</span><small>Режим записи ›</small>
+    </button>
 
     <section class="probe" aria-labelledby="h-probe">
       <h2 class="sec" id="h-probe"><span>Поиск цели</span><span class="cnt">OSINT</span></h2>
@@ -365,6 +370,31 @@
         <button class="btn" type="button" id="okBtn">Закрыть</button>
       </div>
     </div>
+  </div>
+</dialog>
+<dialog id="studioDialog" aria-labelledby="studioTitle">
+  <div class="studio-shell">
+    <header class="studio-head">
+      <div class="studio-brand">
+        <h2 id="studioTitle">Xanaken Studio</h2>
+        <span class="studio-mode">Демо</span>
+      </div>
+      <div class="studio-tools">
+        <button id="studioFrame" class="studio-control" type="button" aria-pressed="false">Режим кадра</button>
+        <button id="studioExit" class="studio-control studio-close" type="button" aria-label="Закрыть студию">×</button>
+      </div>
+    </header>
+    <nav id="studioSections" class="studio-sections" aria-label="Сцены"></nav>
+    <div id="studioStage" class="studio-stage" tabindex="-1"></div>
+    <footer class="studio-rehearsal">
+      <p class="studio-progress-label"><span id="studioStatus" role="status">Сцена 1 из 4</span></p>
+      <div class="studio-progress-track" aria-hidden="true"><i id="studioProgress"></i></div>
+      <div class="studio-controls">
+        <button id="studioPlay" class="studio-control studio-primary" type="button">Старт</button>
+        <button id="studioNext" class="studio-control" type="button">Следующая сцена</button>
+        <button id="studioReset" class="studio-control" type="button">Сначала</button>
+      </div>
+    </footer>
   </div>
 </dialog>
 </body>

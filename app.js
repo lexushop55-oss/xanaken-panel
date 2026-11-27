@@ -125,22 +125,49 @@
   // Режим администратора: только для одного Telegram ID (в коде лежит его хеш, а не сам ID)
   const ADMIN_HASH = 'e9a2b2551cd6398421740c418dc51a345affb6ba2832770ad5ec60403690d7ab';
   let admin = false;
-  const lvl = $('#lvl');
-  const setAdmin = (on) => {
-    admin = on;
-    document.body.classList.toggle('admin', on);
-    if (lvl) lvl.textContent = on ? 'ROOT' : 'Гость';
-  };
-  // Запасной вход для записи видео: 5 быстрых нажатий на эмблему в hero
-  const embBtn = $('#embHero');
-  let taps = [];
-  if (embBtn) {
-    embBtn.addEventListener('click', () => {
-      const now = Date.now();
-      taps = taps.filter((t) => now - t < 2000);
-      taps.push(now);
-      if (taps.length >= 5) { taps = []; setAdmin(!admin); haptic('notify', admin ? 'success' : 'warning'); }
-    });
+  const studioButton = $('#studioBtn');
+  const studioDialog = $('#studioDialog');
+  const studioConfig = $('meta[name="studio-config"]');
+  let studio;
+
+  async function authorizeStudio(user, initData) {
+    if (!user || !initData || !studioConfig || !crypto.subtle) return;
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(user.id)));
+    const ownerHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+    if (ownerHash !== ADMIN_HASH) return;
+
+    const abort = new AbortController();
+    const timeout = setTimeout(() => abort.abort(), 5000);
+    try {
+      const response = await fetch(studioConfig.content, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: initData,
+        cache: 'no-store',
+        credentials: 'omit',
+        redirect: 'error',
+        signal: abort.signal
+      });
+      if (!response.ok) return;
+      const { scenes } = await response.json();
+      if (!Array.isArray(scenes) || scenes.length !== 4) return;
+      const { mountStudio } = await import(studioConfig.dataset.module);
+      studio = mountStudio({
+        button: studioButton,
+        dialog: studioDialog,
+        scenes,
+        onVisibilityChange(isOpen) {
+          if (!can('6.1')) return;
+          try { if (isOpen) tg.BackButton.show(); else tg.BackButton.hide(); } catch (e) {}
+        }
+      });
+      admin = true;
+      document.body.classList.add('admin');
+      $('#lvl').textContent = 'ROOT';
+      studioButton.hidden = false;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   // Что показывает каждый модуль администратору
@@ -564,15 +591,11 @@
       $('#ava').textContent = (name || u.username || 'X').charAt(0).toUpperCase();
     }
 
-    if (u && window.crypto && crypto.subtle && window.TextEncoder) {
-      crypto.subtle.digest('SHA-256', new TextEncoder().encode(String(u.id))).then((buf) => {
-        const hex = Array.from(new Uint8Array(buf)).map((x) => x.toString(16).padStart(2, '0')).join('');
-        if (hex === ADMIN_HASH) setAdmin(true);
-      }).catch(() => {});
-    }
+    authorizeStudio(u, tg.initData).catch(() => {});
     if (can('6.1')) {
       try {
         tg.BackButton.onClick(() => {
+          if (studio && studio.close()) return;
           if (wdlg.open && closeWalletFromBack) closeWalletFromBack();
           else closeDeny();
         });

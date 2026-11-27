@@ -1,0 +1,12 @@
+﻿name = "xanaken-studio"
+main = "worker.mjs"
+compatibility_date = "2026-11-18"
+workers_dev = true
+
+[vars]
+BOT_ID = "9215523883"
+OWNER_HASH = "e9a2b2551cd6398421740c418dc51a345affb6ba2832770ad5ec60403690d7ab"
+APP_ORIGIN = "https://lexushop55-oss.github.io"
+
+[observability]
+enabled = false
