@@ -1,4 +1,5 @@
-﻿const sceneDuration = 7000;
+const sceneDuration = 7000;
+const takeDuration = 5000;
 const galleryTones = new Set(['gold', 'blue', 'green', 'copper']);
 
 function el(tag, className, text) {
@@ -119,9 +120,14 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
   const play = find('#studioPlay');
   const next = find('#studioNext');
   const reset = find('#studioReset');
+  const take = find('#studioTake');
   const frameMode = find('#studioFrame');
   const exit = find('#studioExit');
   let index = 0;
+  let firstScene = 0;
+  let duration = sceneDuration;
+  let moduleTitle = '';
+  let opener = button;
   let elapsed = 0;
   let startedAt = 0;
   let frame = 0;
@@ -142,7 +148,7 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
   }
 
   function updateProgress() {
-    progress.style.transform = 'scaleX(' + Math.min(elapsed / sceneDuration, 1) + ')';
+    progress.style.transform = 'scaleX(' + Math.min(elapsed / duration, 1) + ')';
   }
 
   function render() {
@@ -150,6 +156,8 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
     tabs.forEach((tab, i) => tab.setAttribute('aria-pressed', String(i === index)));
     const slide = el('article', 'studio-slide');
     slide.dataset.scene = scene.kind;
+    slide.append(el('p', 'studio-capture-brand', 'XANAKEN · ДЕМО'));
+    if (moduleTitle) slide.append(el('p', 'studio-module-title', moduleTitle));
     slide.append(el('h3', '', scene.title), el('p', 'studio-description', scene.description), sceneContent(scene));
     stage.replaceChildren(slide);
     updateControls();
@@ -175,7 +183,7 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
     if (!playing) return;
     elapsed = now - startedAt;
     updateProgress();
-    if (elapsed >= sceneDuration) {
+    if (elapsed >= duration) {
       if (index + 1 === scenes.length) {
         finished = true;
         pause();
@@ -191,7 +199,7 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
       pause();
       return;
     }
-    if (finished) select(0);
+    if (finished) select(firstScene);
     playing = true;
     startedAt = performance.now() - elapsed;
     updateControls();
@@ -205,9 +213,13 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
     if (active) stage.focus({ preventScroll: true });
   }
 
-  function open() {
+  function open({ kind, label = '', from = button } = {}) {
     if (dialog.open) return;
-    select(0);
+    opener = from;
+    moduleTitle = label;
+    firstScene = Math.max(0, scenes.findIndex((scene) => scene.kind === kind));
+    duration = sceneDuration;
+    select(firstScene);
     toggleFrame(false);
     dialog.showModal();
     exit.focus({ preventScroll: true });
@@ -219,17 +231,26 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
     pause();
     toggleFrame(false);
     dialog.close();
-    button.focus({ preventScroll: true });
+    opener.focus({ preventScroll: true });
     onVisibilityChange(false);
     return true;
   }
 
-  button.addEventListener('click', open);
+  button.addEventListener('click', () => open());
   exit.addEventListener('click', close);
   dialog.addEventListener('cancel', (event) => { event.preventDefault(); close(); });
   play.addEventListener('click', togglePlay);
   next.addEventListener('click', () => select(Math.min(index + 1, scenes.length - 1)));
-  reset.addEventListener('click', () => { pause(); select(0); });
+  reset.addEventListener('click', () => { pause(); select(firstScene); });
+  take.addEventListener('click', () => {
+    pause();
+    moduleTitle = '';
+    firstScene = 0;
+    duration = takeDuration;
+    select(firstScene);
+    toggleFrame(true);
+    togglePlay();
+  });
   frameMode.addEventListener('click', () => toggleFrame(!dialog.classList.contains('studio-frame-mode')));
   dialog.addEventListener('keydown', (event) => {
     if (event.target.closest('button, input, select, textarea') || event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
@@ -240,5 +261,5 @@ export function mountStudio({ button, dialog, scenes, onVisibilityChange }) {
     }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
-  return { close };
+  return { open, close };
 }

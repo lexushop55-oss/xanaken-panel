@@ -197,46 +197,14 @@
     authorizeStudio(tg?.initDataUnsafe?.user, tg?.initData).catch(() => studioAccessError('Связь со студией прервалась.'));
   });
 
-  // Что показывает каждый модуль администратору
-  const L = (a) => ({ v: 'log', l: a });
-  const RES = {
-    'Снести аккаунт Telegram': { t: 'Аккаунт удалён', m: 'Аккаунт заблокирован и удалён из Telegram', ...L(['жалобы приняты: 1 240', 'статус: удалён', 'время: 02:41']) },
-    'Снести аккаунт WhatsApp': { t: 'Номер отключён', m: 'WhatsApp на этом номере больше не работает', ...L(['номер заблокирован', 'резервные копии стёрты', 'время: 03:17']) },
-    'Доступ к галерее через iCloud': { t: 'Галерея открыта', m: 'Фото: 2 418 · Видео: 312', v: 'gallery' },
-    'Пробить по ID-номеру': { t: 'Человек найден', m: 'Профиль собран по ID', v: 'profile' },
-    'Пробив цели': { t: 'Цель найдена', m: 'Профиль собран по открытым базам', v: 'profile' },
-    'Накрутка соцсетей': { t: 'Накрутка запущена', m: 'Подписчики уже идут на аккаунт', v: 'counter', n: 10000, cap: 'подписчиков' },
-    'База данных': { t: 'База подключена', m: 'Поиск по всем слитым базам', v: 'counter', n: 1284, cap: 'записей найдено' },
-    'Сканер устройств рядом': { t: 'Подключено', m: 'Соединение с устройством установлено', ...L(['iPhone 15 Pro · −48 dBm', 'сопряжение: ok', 'файлы: доступны']) },
-    'Режим призрака': { t: 'Режим призрака включён', m: 'Твой IP скрыт, следы входа стёрты', ...L(['VPN-цепочка: 3 узла', 'IP: скрыт', 'логи: очищены']) },
-    'Перехват SMS и кодов': { t: 'Код перехвачен', m: 'Последнее SMS с кодом входа', ...L(['от: Telegram', 'код: 4•8•1', 'получено 12 сек назад']) },
-    'Геолокация по номеру': { t: 'Телефон найден', m: 'Точность до 12 метров', v: 'geo' },
-    'Удалённый доступ к телефону': { t: 'Телефон под контролем', m: 'Камера, микрофон и файлы доступны', ...L(['камера: on', 'микрофон: on', 'файлы: 14,2 ГБ']) },
-    'Обход двухфакторной защиты': { t: '2FA отключена', m: 'Вход без второго кода выполнен', ...L(['сессия: открыта', 'уведомление: скрыто', 'устройство: доверенное']) },
-    'DDoS-атака': { t: 'Атака запущена', m: 'Сайт перестал отвечать', v: 'counter', n: 40000, cap: 'ботов в атаке' },
-    'Деанон по фото': { t: 'Человек найден', m: 'Совпадение лица 97%', v: 'profile' },
-    'Взлом Wi-Fi': { t: 'Пароль подобран', m: 'Подключение к сети выполнено', ...L(['сеть: Home_5G', 'пароль: ••••••••••', 'подключено']) },
-    'Подмена номера': { t: 'Номер подменён', m: 'Звонок и SMS пойдут с выбранного номера', ...L(['номер: +7 7•• ••• ••-00', 'статус: активен']) },
-    'Чтение переписки': { t: 'Переписка открыта', m: 'Чаты загружены без входа в аккаунт', v: 'chat' },
-    'Прослушка звонков': { t: 'Прослушка включена', m: 'Разговоры записываются в архив', ...L(['линия: подключена', 'запись: идёт', 'архив: 0 мин']) },
-    'Восстановление удалённого': { t: 'Восстановлено', m: 'Стёртые данные вернулись', v: 'counter', n: 342, cap: 'сообщений и фото' },
-    'Отслеживание онлайна': { t: 'Слежка включена', m: 'Пришлём уведомление, когда человек зайдёт в сеть', ...L(['последний раз: 4 мин назад', 'уведомления: on']) },
-    'Клон SIM-карты': { t: 'SIM склонирована', m: 'Номер работает на твоём телефоне', ...L(['IMSI: скопирован', 'сеть: зарегистрирована', 'SMS: приходят тебе']) },
-    'Камеры наблюдения': { t: 'Камеры подключены', m: 'Найдено 9 камер рядом', v: 'gallery' },
-    'Скрытые фото с камеры': { t: 'Снимок сделан', m: 'Фото с фронтальной камеры загружено', v: 'gallery' }
+  const demoScenes = {
+    profile: new Set(['Пробив цели', 'Пробить по ID-номеру', 'Деанон по фото', 'Чтение переписки', 'Отслеживание онлайна']),
+    network: new Set(['Сканер устройств рядом', 'Взлом Wi-Fi', 'Геолокация по номеру', 'Режим призрака', 'Подмена номера']),
+    gallery: new Set(['Доступ к галерее через iCloud', 'Камеры наблюдения', 'Скрытые фото с камеры', 'Восстановление удалённого'])
   };
-  const resultFor = (name) => {
-    if (RES[name]) return RES[name];
-    if (name.indexOf('Взлом ') === 0) {
-      return { t: 'Доступ получен', m: 'Ты вошёл в аккаунт ' + name.slice(6) + '. Сессия открыта', v: 'chat' };
-    }
-    return { t: 'Готово', m: 'Модуль выполнен', ...L(['сессия: открыта', 'следы: стёрты']) };
-  };
+  const demoScene = (name) => Object.keys(demoScenes).find((kind) => demoScenes[kind].has(name))
+    || (name.startsWith('Взлом ') ? 'profile' : 'report');
 
-  const okTitle = $('#okTitle');
-  const okMsg = $('#okMsg');
-  const okVis = $('#okVis');
-  const okBtn = $('#okBtn');
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
   const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
@@ -280,82 +248,36 @@
   });
   $('#h-probe').appendChild(priceTag(prices['Пробив цели']));
 
-  const buildVis = (r, extra) => {
-    okVis.textContent = '';
-    if (r.v === 'gallery') {
-      const g = el('div', 'gal');
-      for (let i = 0; i < 12; i++) g.appendChild(el('i'));
-      okVis.appendChild(g);
-    } else if (r.v === 'profile') {
-      const p = el('dl', 'prof');
-      const rows = [['Цель', extra || '@' + ['user', 'id'][rnd(0, 1)] + rnd(1000, 9999)], ['Имя', 'А•••••• К••••••'], ['Телефон', '+7 7•• ••• ••-' + rnd(10, 99)],
-        ['Город', '••••••'], ['Соцсети', rnd(3, 6) + ' найдено'], ['Последний вход', rnd(2, 40) + ' мин назад']];
-      rows.forEach(([k, v]) => { const d = el('div'); d.append(el('dt', '', k), el('dd', '', v)); p.appendChild(d); });
-      okVis.appendChild(p);
-    } else if (r.v === 'counter') {
-      const big = el('p', 'cnt-big', '0');
-      okVis.append(big, el('p', 'cap', r.cap || ''));
-      const t0 = performance.now(); const dur = reduce ? 1 : 1400;
-      const step = (now) => {
-        const k = Math.min(1, (now - t0) / dur);
-        big.textContent = '+' + fmt(Math.round(r.n * (1 - Math.pow(1 - k, 3))));
-        if (k < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    } else if (r.v === 'chat') {
-      const c = el('div', 'chat');
-      ['a', 'b', 'a', 'a', 'b'].forEach((side, i) => { const b = el('i', side === 'b' ? 'me' : ''); b.classList.add('w' + (i % 4)); c.appendChild(b); });
-      okVis.appendChild(c);
-    } else if (r.v === 'geo') {
-      const g = el('div', 'geo');
-      g.append(el('i', 'pin'), el('span', 'geo-cap', '43.2•••, 76.9••• · ±12 м'));
-      okVis.appendChild(g);
-    } else {
-      const ul = el('ul', 'oklog');
-      (r.l || []).forEach((line) => ul.appendChild(el('li', '', line)));
-      okVis.appendChild(ul);
-    }
-  };
-
   const showDenied = () => {
     dlg.classList.add('denied');
     dlg.setAttribute('aria-labelledby', 'denyTitle');
     dlg.setAttribute('aria-describedby', 'denyMsg');
     haptic('notify', 'error');
   };
-  const showGranted = (name, extra) => {
-    const r = resultFor(name);
-    okTitle.textContent = r.t;
-    okMsg.textContent = r.m || '';
-    buildVis(r, extra);
-    dlg.classList.add('granted');
-    dlg.setAttribute('aria-labelledby', 'okTitle');
-    dlg.setAttribute('aria-describedby', 'okMsg');
-    haptic('notify', 'success');
-  };
-
-  const openDeny = (name, from, extra) => {
-    opener = from || null;
+  const openModule = (name, from) => {
     haptic('impact', 'medium');
-    dlg.classList.remove('denied', 'granted', 'in');
-    if (admin) showGranted(name, extra);
-    else showDenied();
+    if (admin && studio) {
+      studio.open({ kind: demoScene(name), label: name, from });
+      return;
+    }
+    opener = from || null;
+    dlg.classList.remove('denied', 'in');
+    showDenied();
     if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); }
     else dlg.setAttribute('open', '');
-    (admin ? okBtn : ok).focus({ preventScroll: true });
+    ok.focus({ preventScroll: true });
     requestAnimationFrame(() => requestAnimationFrame(() => dlg.classList.add('in')));
     if (can('6.1')) { try { tg.BackButton.show(); } catch (e) {} }
   };
 
   const closeDeny = () => {
     if (!dlg.open) return;
-    const wasGrant = dlg.classList.contains('granted');
     dlg.classList.remove('in');
     if (can('6.1')) { try { tg.BackButton.hide(); } catch (e) {} }
     setTimeout(() => {
       if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open');
-      dlg.classList.remove('denied', 'granted');
-      if (ghost && !(wasGrant && opener === ghost)) ghost.setAttribute('aria-checked', 'false');
+      dlg.classList.remove('denied');
+      if (ghost) ghost.setAttribute('aria-checked', 'false');
       if (opener && opener.isConnected) opener.focus({ preventScroll: true });
     }, reduce ? 0 : 300);
   };
@@ -363,7 +285,6 @@
   dlg.addEventListener('cancel', (e) => { e.preventDefault(); closeDeny(); });
   dlg.addEventListener('click', (e) => { if (e.target === dlg) closeDeny(); });
   ok.addEventListener('click', closeDeny);
-  okBtn.addEventListener('click', closeDeny);
 
   // Поиск цели: введённое никуда не отправляется, только показывается на экране
   const form = $('#probe');
@@ -411,6 +332,10 @@
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (probing) return;
+      if (admin && studio) {
+        openModule('Пробив цели', go);
+        return;
+      }
       const v = input.value.trim();
       const check = checkUser(v);
       if (check !== true) {
@@ -472,7 +397,7 @@
           haptic('select');
           if (i === stages.length - 1) {
             run.classList.add('fail');
-            setTimeout(() => { probing = false; go.disabled = false; openDeny('Пробив цели', go, v); }, 450);
+            setTimeout(() => { probing = false; go.disabled = false; openModule('Пробив цели', go); }, 450);
           }
         }, 300 + i * stepMs);
       });
@@ -495,7 +420,7 @@
   modules.forEach((button) => {
     button.addEventListener('click', () => {
       if (button === ghost) ghost.setAttribute('aria-checked', 'true');
-      openDeny(button.dataset.mod, button);
+      openModule(button.dataset.mod, button);
     });
   });
 

@@ -367,67 +367,6 @@ dialog.in .sheet{transform:none}
 .c-icloud .price,.row .price{align-self:center}
 .feature .ic{align-self:flex-start}
 
-/* кольцо: галочка для ROOT */
-.ico-ok{display:none;width:30px;height:30px;stroke-width:2.4}
-.granted .ring{color:#07100b;border-color:rgba(61,220,151,.7);background:radial-gradient(circle,#6ff0ad,#14a059 76%);animation:none}
-.granted .ring .ico-lock{display:none}
-.granted .ring .ico-ok{display:block;animation:pop .4s var(--spring) both}
-.granted .ring::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:2px solid rgba(61,220,151,.5);animation:pulse 1.6s ease-out infinite}
-
-/* результат ROOT */
-.phase-grant{display:none}
-.granted .phase-grant{display:block}
-.phase-grant .code{color:#5fe3a0}
-.granted .glitch::before,.granted .glitch::after{display:none}
-.vis{margin:4px 0 18px}
-
-/* витрина результата */
-.gal{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.gal i{aspect-ratio:1;border-radius:9px;background:linear-gradient(135deg,#20242c,#12151b);position:relative;overflow:hidden;
-  animation:tileIn .4s var(--ease) both}
-.gal i::after{content:"";position:absolute;inset:0;background:
-  radial-gradient(circle at 30% 30%,rgba(226,187,108,.5),transparent 42%),
-  linear-gradient(120deg,rgba(47,125,225,.45),rgba(31,160,103,.4));opacity:.65}
-.gal i:nth-child(2){animation-delay:.03s}.gal i:nth-child(3){animation-delay:.06s}.gal i:nth-child(4){animation-delay:.09s}
-.gal i:nth-child(5){animation-delay:.12s}.gal i:nth-child(6){animation-delay:.15s}.gal i:nth-child(7){animation-delay:.18s}
-.gal i:nth-child(8){animation-delay:.21s}.gal i:nth-child(9){animation-delay:.24s}.gal i:nth-child(10){animation-delay:.27s}
-.gal i:nth-child(11){animation-delay:.3s}.gal i:nth-child(12){animation-delay:.33s}
-
-.prof{display:flex;flex-direction:column;gap:0;text-align:left;border-radius:14px;overflow:hidden;border:1px solid var(--line-2)}
-.prof div{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-top:1px solid var(--line);background:#0c0d11;animation:rowIn .34s var(--ease) both}
-.prof div:first-child{border-top:0}
-.prof div:nth-child(2){animation-delay:.05s}.prof div:nth-child(3){animation-delay:.1s}.prof div:nth-child(4){animation-delay:.15s}
-.prof div:nth-child(5){animation-delay:.2s}.prof div:nth-child(6){animation-delay:.25s}
-.prof dt{font:500 12px/1.3 var(--mono);color:var(--faint)}
-.prof dd{margin:0;font:600 13px/1.3 var(--sans);color:var(--text);text-align:right}
-
-.cnt-big{font:800 40px/1 var(--sans);letter-spacing:-.02em;color:#5fe3a0;font-variant-numeric:tabular-nums}
-.cap{margin-top:4px;font:500 13px/1.3 var(--sans);color:var(--muted)}
-
-.chat{display:flex;flex-direction:column;gap:7px}
-.chat i{height:16px;border-radius:9px;background:#23252c;animation:rowIn .3s var(--ease) both}
-.chat i.me{align-self:flex-end;background:linear-gradient(135deg,#2f6fd0,#1a4a9c)}
-.chat i.w0{width:62%}.chat i.w1{width:48%}.chat i.w2{width:72%}.chat i.w3{width:40%}
-.chat i:nth-child(2){animation-delay:.06s}.chat i:nth-child(3){animation-delay:.12s}.chat i:nth-child(4){animation-delay:.18s}.chat i:nth-child(5){animation-delay:.24s}
-
-.geo{position:relative;height:130px;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);
-  background:
-   repeating-linear-gradient(0deg,rgba(61,220,151,.08) 0 1px,transparent 1px 26px),
-   repeating-linear-gradient(90deg,rgba(61,220,151,.08) 0 1px,transparent 1px 26px),
-   radial-gradient(circle at 50% 55%,#0c2018,#060a08)}
-.geo .pin{position:absolute;left:50%;top:48%;width:20px;height:20px;margin:-20px 0 0 -10px;border-radius:50% 50% 50% 0;
-  transform:rotate(-45deg);background:#5fe3a0;box-shadow:0 0 16px 2px rgba(61,220,151,.7);animation:drop .5s var(--spring) both}
-.geo .pin::after{content:"";position:absolute;inset:5px;border-radius:50%;background:#07100b}
-.geo::after{content:"";position:absolute;left:50%;top:48%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
-  border:2px solid rgba(61,220,151,.6);animation:ripGeo 1.8s ease-out infinite}
-.geo-cap{position:absolute;left:10px;bottom:9px;font:500 11px/1 var(--mono);color:#7ee8b4;background:rgba(0,0,0,.5);padding:5px 8px;border-radius:7px}
-
-.oklog{list-style:none;margin:0;padding:12px;text-align:left;border-radius:14px;border:1px solid var(--line-2);background:#0a0b0e;
-  font:500 12.5px/1.9 var(--mono);color:var(--muted)}
-.oklog li{animation:lineIn .26s var(--ease) both}
-.oklog li::before{content:"✓ ";color:#5fe3a0}
-.oklog li:nth-child(2){animation-delay:.08s}.oklog li:nth-child(3){animation-delay:.16s}
-
 /* цена и покупка в окне отказа */
 .price-line{margin:-4px auto 14px;font:600 14px/1.4 var(--sans);color:var(--muted)}
 .price-line b{color:var(--gold);font-weight:800}
@@ -775,8 +714,45 @@ body{background:#000}
 .studio-progress-track i { display: block; height: 100%; background: var(--studio-gold); transform-origin: left; transform: scaleX(0); }
 .studio-controls { margin-top: 10px; }
 .studio-controls .studio-primary { flex: 1; }
-.studio-frame-mode .studio-sections, .studio-frame-mode .studio-controls { display: none; }
-.studio-frame-mode .studio-stage { margin-top: 18px; }
+.studio-module-title {
+  margin: 0 0 6px;
+  color: var(--studio-gold);
+  font: 700 11px/1.3 var(--mono);
+}
+.studio-capture-brand { display: none; }
+.studio-take {
+  width: 100%;
+  margin-top: 7px;
+  border-color: #886939;
+  color: var(--studio-gold);
+}
+#studioDialog.studio-frame-mode .studio-sections,
+#studioDialog.studio-frame-mode .studio-tools .studio-close,
+#studioDialog.studio-frame-mode .studio-rehearsal { display: none; }
+#studioDialog.studio-frame-mode .studio-stage {
+  box-sizing: border-box;
+  width: min(100%, 384px, 42vh);
+  width: min(100%, 384px, 42dvh);
+  aspect-ratio: 9 / 16;
+  min-height: 0;
+  overflow: auto;
+  margin: 12px auto 0;
+  padding: clamp(9px, 3vw, 16px);
+  border: 1px solid #785e36;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 88% 0%, #2c2116, #100e10 76%);
+}
+.studio-frame-mode .studio-capture-brand {
+  display: block;
+  margin: 0 0 14px;
+  color: var(--studio-gold);
+  font: 800 11px/1.15 var(--mono);
+  letter-spacing: .13em;
+}
+.studio-frame-mode .studio-slide > h3 {
+  font-size: clamp(19px, 6vw, 30px);
+}
+.studio-frame-mode .studio-gallery.expanded .studio-art { min-height: 180px; }
 @media (max-width: 360px) {
   .studio-head { flex-wrap: wrap; }
   .studio-tools { margin-left: auto; }
